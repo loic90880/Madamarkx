@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Panier — MadaMarket</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header class="header">
+        <a href="../index.html"><img src="../assets/logo-madamarket.svg" alt="MadaMarket" height="42"></a>
+        <a href="../index.html" class="btn-green">← Continuer mes achats</a>
+    </header>
+
+    <main class="container" style="max-width:780px;">
+        <div class="panel">
+            <h2 style="color:var(--green);margin-bottom:14px;">🛒 Mon Panier</h2>
+            <div id="cartList"></div>
+            <div id="cartSummary" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--gray-border);"></div>
+        </div>
+    </main>
+
+    <script src="../js/app.js"></script>
+    <script>
+        function renderCartPage() {
+            const cart = getCart();
+            const listEl = document.getElementById('cartList');
+            const sumEl = document.getElementById('cartSummary');
+
+            if (cart.length === 0) {
+                listEl.innerHTML = '<p>Votre panier est vide.</p>';
+                sumEl.innerHTML = '';
+                return;
+            }
+
+            listEl.innerHTML = cart.map((item, idx) => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;gap:10px;flex-wrap:wrap;">
+                    <div>
+                        <strong>${item.name}</strong><br>
+                        <small style="color:var(--muted);">Boutique : ${item.shop} (${item.city}) — ${formatAr(item.price)}</small>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <button class="btn-green" style="padding:4px 10px;" onclick="changeQty(${idx}, -1)">-</button>
+                        <strong>${item.qty}</strong>
+                        <button class="btn-green" style="padding:4px 10px;" onclick="changeQty(${idx}, 1)">+</button>
+                        <button class="btn-orange" style="padding:4px 10px;" onclick="removeItem(${idx})">Supprimer</button>
+                    </div>
+                </div>
+            `).join('');
+
+            const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+            const delivery = 6000;
+            sumEl.innerHTML = `
+                <p>Sous-total : <strong>${formatAr(subtotal)}</strong></p>
+                <p>Livraison estimée : <strong>${formatAr(delivery)}</strong></p>
+                <p style="font-size:1.15rem;margin-top:6px;">Total estimé : <strong style="color:var(--green);">${formatAr(subtotal + delivery)}</strong></p>
+                <br>
+                <button class="btn-orange" onclick="alert('Commande prête pour validation vers le Backend MySQL !')">Valider la commande</button>
+            `;
+        }
+
+        function changeQty(idx, delta) {
+            const cart = getCart();
+            cart[idx].qty += delta;
+            if (cart[idx].qty <= 0) cart.splice(idx, 1);
+            saveCart(cart);
+            renderCartPage();
+        }
+
+        function removeItem(idx) {
+            const cart = getCart();
+            cart.splice(idx, 1);
+            saveCart(cart);
+            renderCartPage();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderCartPage);
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MadaMarket — Madagascar achète, Madagascar vend !</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="top-strip">
+        <span>🇲🇬 Livraison : Antananarivo, Mahajanga, Toamasina, Antsirabe, Fianarantsoa, Toliara, Antsiranana</span>
+        <span>MVola • Orange Money • Airtel Money • Cash à la livraison</span>
+    </div>
+
+    <header class="header">
+        <a href="index.html"><img src="assets/logo-madamarket.svg" alt="MadaMarket" height="44"></a>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Rechercher un produit ou une boutique..." oninput="renderProducts()">
+            <button onclick="renderProducts()">Chercher</button>
+        </div>
+
+        <nav class="nav-links">
+            <a href="pages/login.html" class="btn-green">Connexion / Inscription</a>
+            <a href="pages/cart.html" class="cart-link">🛒 Panier <span class="badge" id="cartBadge">0</span></a>
+        </nav>
+    </header>
+
+    <div class="cat-bar">
+        <button class="cat-pill active" onclick="selectCategoryPill('', this)">Tout voir</button>
+        <button class="cat-pill" onclick="selectCategoryPill('Téléphones & Tablettes', this)">Téléphones</button>
+        <button class="cat-pill" onclick="selectCategoryPill('Informatique & Électronique', this)">Informatique</button>
+        <button class="cat-pill" onclick="selectCategoryPill('Produits Locaux & Artisanat', this)">Artisanat & Terroir</button>
+        <button class="cat-pill" onclick="selectCategoryPill('Alimentation & Épicerie', this)">Alimentation</button>
+        <button class="cat-pill" onclick="selectCategoryPill('Mode & Vêtements', this)">Mode</button>
+    </div>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Madagascar achète, Madagascar vend !</h1>
+            <p>Marketplace multi-vendeurs pour particuliers, commerçants et entreprises à travers toute la Grande Île.</p>
+            <a href="pages/login.html" class="btn-orange">Créer ma boutique</a>
+        </section>
+
+        <div class="main-layout">
+            <aside class="sidebar">
+                <h3 style="margin-bottom:12px;">Filtres</h3>
+
+                <div class="filter-block">
+                    <label>Catégorie</label>
+                    <select id="filterCat" onchange="renderProducts()">
+                        <option value="">Toutes</option>
+                        <option value="Téléphones & Tablettes">Téléphones & Tablettes</option>
+                        <option value="Informatique & Électronique">Informatique & Électronique</option>
+                        <option value="Produits Locaux & Artisanat">Produits Locaux & Artisanat</option>
+                        <option value="Alimentation & Épicerie">Alimentation & Épicerie</option>
+                        <option value="Mode & Vêtements">Mode & Vêtements</option>
+                    </select>
+                </div>
+
+                <div class="filter-block">
+                    <label>Ville</label>
+                    <select id="filterCity" onchange="renderProducts()">
+                        <option value="">Toutes les villes</option>
+                        <option value="Antananarivo">Antananarivo</option>
+                        <option value="Mahajanga">Mahajanga</option>
+                        <option value="Toamasina">Toamasina</option>
+                        <option value="Antsirabe">Antsirabe</option>
+                        <option value="Fianarantsoa">Fianarantsoa</option>
+                        <option value="Toliara">Toliara</option>
+                        <option value="Antsiranana">Antsiranana</option>
+                    </select>
+                </div>
+
+                <div class="filter-block">
+                    <label>Prix (Ariary)</label>
+                    <input type="number" id="minPrice" placeholder="Prix minimum" oninput="renderProducts()">
+                    <input type="number" id="maxPrice" placeholder="Prix maximum" oninput="renderProducts()">
+                </div>
+
+                <div class="filter-block">
+                    <label>Note minimum</label>
+                    <select id="filterRating" onchange="renderProducts()">
+                        <option value="0">Toutes les notes</option>
+                        <option value="4.5">4.5 ★ et plus</option>
+                        <option value="4">4.0 ★ et plus</option>
+                    </select>
+                </div>
+
+                <div class="filter-block">
+                    <label><input type="checkbox" id="onlyStock" onchange="renderProducts()"> En stock uniquement</label>
+                    <label style="margin-top:6px;"><input type="checkbox" id="onlyPromo" onchange="renderProducts()"> Promotions uniquement</label>
+                </div>
+            </aside>
+
+            <section>
+                <div class="section-header">
+                    <h2>Catalogue MadaMarket</h2>
+                    <select id="sortSelect" onchange="renderProducts()" style="width:auto;padding:8px;">
+                        <option value="popular">Produits populaires</option>
+                        <option value="best_sales">Meilleures ventes</option>
+                        <option value="price_asc">Prix : croissant</option>
+                        <option value="price_desc">Prix : décroissant</option>
+                    </select>
+                </div>
+
+                <div class="grid-products" id="productsGrid"></div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <strong>MADAMARKET</strong> — Madagascar achète, Madagascar vend !
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

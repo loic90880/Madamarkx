@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MADAMARKET — Madagascar achète, Madagascar vend !</title>
+  <style>
+    :root {
+      --green: #16A34A;
+      --green-dark: #15803D;
+      --green-deep: #0F291A;
+      --green-soft: #ECFDF5;
+      --orange: #F97316;
+      --orange-dark: #EA580C;
+      --orange-soft: #FFF7ED;
+      --blue-msg: #0084FF;
+      --white: #FFFFFF;
+      --bg: #F3F4F6;
+      --border: #E5E7EB;
+      --text: #111827;
+      --muted: #6B7280;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+    html, body { max-width: 100%; overflow-x: hidden; background: var(--bg); color: var(--text); line-height: 1.45; }
+
+    .ico { width: 17px; height: 17px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .ico-lg { width: 38px; height: 38px; stroke: var(--green-dark); stroke-width: 1.75; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+    .top-strip { background: var(--green-deep); color: #F9FAFB; font-size: 0.74rem; padding: 6px 14px; display: flex; justify-content: space-between; align-items: center; gap: 14px; overflow-x: auto; white-space: nowrap; }
+    .top-strip b { color: #FDBA74; }
+
+    .header { background: var(--white); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 120; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
+    .header-row { max-width: 1340px; margin: 0 auto; padding: 10px 14px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px; }
+    .brand { display: flex; align-items: center; cursor: pointer; flex-shrink: 0; }
+
+    .search-bar { display: flex; align-items: center; background: #F9FAFB; border: 1.5px solid var(--green); border-radius: 999px; padding: 2px 3px 2px 12px; min-width: 0; }
+    .search-bar input { flex: 1; min-width: 0; border: none; background: transparent; margin: 0; padding: 8px 8px; font-size: 0.88rem; outline: none; color: var(--text); }
+    .search-bar button { background: var(--orange); color: var(--white); border: none; border-radius: 999px; padding: 8px 15px; font-weight: 700; font-size: 0.84rem; cursor: pointer; flex-shrink: 0; }
+    .search-bar button:hover { background: var(--orange-dark); }
+
+    .header-controls { display: flex; align-items: center; gap: 7px; position: relative; flex-shrink: 0; justify-self: end; }
+
+    .icon-btn { background: #F9FAFB; color: var(--text); border: 1px solid var(--border); border-radius: 999px; padding: 8px 11px; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; position: relative; white-space: nowrap; }
+    .icon-btn:hover { border-color: var(--green); background: var(--green-soft); color: var(--green-dark); }
+    .icon-btn.cart-btn { background: var(--orange-soft); border-color: #FED7AA; color: var(--orange-dark); }
+    .icon-btn.cart-btn.active, .icon-btn.profile-btn.open { background: var(--orange); border-color: var(--orange); color: var(--white); }
+
+    .badge-num { background: var(--orange); color: var(--white); font-size: 0.7rem; font-weight: 800; padding: 1px 6px; border-radius: 999px; }
+    .icon-btn.cart-btn.active .badge-num { background: var(--white); color: var(--orange-dark); }
+
+    .profile-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 250px; max-width: calc(100vw - 20px); background: var(--white); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 12px 28px rgba(17, 24, 39, 0.14); padding: 6px; display: none; z-index: 200; }
+    .profile-menu.open { display: block; }
+    .profile-header { padding: 8px 10px; border-bottom: 1px solid var(--border); margin-bottom: 4px; }
+    .profile-header strong { display: block; font-size: 0.85rem; }
+    .profile-header span { font-size: 0.73rem; color: var(--green-dark); font-weight: 700; }
+
+    .menu-action { width: 100%; background: transparent; border: none; border-radius: 8px; padding: 9px 10px; font-size: 0.84rem; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 9px; cursor: pointer; text-align: left; }
+    .menu-action:hover { background: var(--green-soft); color: var(--green-dark); }
+    .menu-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+    .cat-bar { background: var(--white); border-top: 1px solid var(--border); }
+    .cat-bar-inner { max-width: 1340px; margin: 0 auto; padding: 7px 14px; display: flex; align-items: center; gap: 7px; overflow-x: auto; scrollbar-width: none; }
+    .cat-bar-inner::-webkit-scrollbar { display: none; }
+    .cat-pill { background: #F9FAFB; color: var(--text); border: 1px solid var(--border); padding: 5px 12px; border-radius: 999px; font-size: 0.79rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
+    .cat-pill:hover, .cat-pill.active { background: var(--green-soft); color: var(--green-dark); border-color: var(--green); }
+
+    .main { max-width: 1340px; margin: 16px auto; padding: 0 12px; }
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .promo-hero { background: linear-gradient(125deg, var(--green) 0%, var(--green-dark) 60%, var(--green-deep) 100%); color: var(--white); border-radius: 14px; padding: 18px; margin-bottom: 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+    .promo-hero h1 { font-size: 1.32rem; font-weight: 800; margin-bottom: 4px; }
+    .promo-hero p { font-size: 0.85rem; color: #DCFCE7; }
+
+    .btn-orange { background: var(--orange); color: var(--white); border: none; border-radius: 9px; padding: 9px 14px; font-weight: 700; font-size: 0.84rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-orange:hover { background: var(--orange-dark); }
+    .btn-green { background: var(--green); color: var(--white); border: none; border-radius: 9px; padding: 8px 13px; font-weight: 700; font-size: 0.83rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-green:hover { background: var(--green-dark); }
+    .btn-soft { background: #E5E7EB; color: var(--text); border: none; border-radius: 9px; padding: 9px 13px; font-weight: 700; font-size: 0.84rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-outline { background: var(--white); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-weight: 600; font-size: 0.79rem; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+    .btn-outline:hover { border-color: var(--green); color: var(--green-dark); }
+
+    .catalog-layout { display: grid; grid-template-columns: 250px 1fr; gap: 16px; align-items: start; }
+
+    .card-box { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); min-width: 0; }
+    .box-head { font-size: 0.95rem; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--text); }
+    .f-sec { margin-bottom: 11px; padding-bottom: 9px; border-bottom: 1px solid var(--border); }
+    .f-sec label { display: block; font-size: 0.79rem; font-weight: 700; margin-bottom: 5px; }
+
+    input, select, textarea { width: 100%; max-width: 100%; padding: 8px 10px; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 0.87rem; background: var(--white); margin-bottom: 7px; color: var(--text); }
+
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); gap: 12px; }
+    .prod-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+    .prod-thumb { height: 128px; background: linear-gradient(145deg, var(--green-soft), #F0FDF4); display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 1px solid #F3F4F6; }
+    .disc-tag { position: absolute; top: 8px; left: 8px; background: var(--orange); color: var(--white); font-size: 0.7rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; }
+    .stock-pill { position: absolute; top: 8px; right: 8px; background: var(--white); color: var(--green-dark); border: 1px solid #BBF7D0; font-size: 0.69rem; font-weight: 700; padding: 2px 7px; border-radius: 999px; }
+    .prod-body { padding: 11px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .prod-meta { font-size: 0.72rem; color: var(--green-dark); font-weight: 700; }
+    .prod-title { font-size: 0.89rem; font-weight: 700; margin: 4px 0 6px; overflow-wrap: anywhere; }
+    .prod-price { font-size: 1rem; font-weight: 800; }
+    .prod-old { font-size: 0.76rem; color: var(--muted); text-decoration: line-through; margin-left: 5px; }
+    .prod-shop { font-size: 0.75rem; color: var(--muted); margin-top: 4px; overflow-wrap: anywhere; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; align-items: start; }
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .kpi-item { background: var(--white); border: 1px solid var(--border); border-top: 4px solid var(--green); border-radius: 10px; padding: 12px; }
+    .kpi-item.or { border-top-color: var(--orange); }
+    .kpi-item small { font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .kpi-item div { font-size: 1.08rem; font-weight: 800; margin-top: 3px; }
+
+    .list-line { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 0.84rem; min-width: 0; }
+    .list-line:last-child { border-bottom: none; }
+
+    .status-chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.71rem; font-weight: 700; background: var(--green-soft); color: var(--green-dark); }
+    .status-chip.wait { background: var(--orange-soft); color: var(--orange-dark); }
+    .pay-box { background: var(--green-soft); border: 1px solid #BBF7D0; border-radius: 8px; padding: 10px; font-size: 0.81rem; margin-bottom: 10px; overflow-wrap: anywhere; }
+
+    .auth-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+    .auth-tab { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: #F9FAFB; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+    .auth-tab.active { background: var(--green); color: var(--white); border-color: var(--green); }
+
+    .fb-shell { max-width: 720px; margin: 0 auto; width: 100%; }
+    .fb-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); min-width: 0; }
+
+    .comm-topbar { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 9px 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .comm-tabs { display: flex; gap: 6px; }
+    .comm-tab { padding: 6px 13px; border-radius: 999px; border: 1px solid var(--border); background: #F9FAFB; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
+    .comm-tab.active { background: var(--green-soft); color: var(--green-dark); border-color: var(--green); }
+
+    .composer-row { padding: 11px 12px; display: flex; align-items: center; gap: 8px; }
+    .composer-pill { flex: 1; min-width: 0; background: #F3F4F6; border: 1px solid var(--border); border-radius: 999px; padding: 9px 13px; font-size: 0.85rem; color: var(--muted); text-align: left; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .photo-shortcut { background: transparent; border: none; color: var(--green-dark); font-weight: 700; font-size: 0.78rem; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; padding: 4px 6px; flex-shrink: 0; }
+
+    .stories-strip { display: flex; gap: 9px; padding: 10px 12px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .stories-strip::-webkit-scrollbar { display: none; }
+    .story-card { width: 104px; height: 162px; border-radius: 12px; overflow: hidden; position: relative; flex-shrink: 0; border: 1px solid var(--border); background: #E5E7EB; cursor: pointer; display: flex; flex-direction: column; justify-content: flex-end; }
+    .story-card img.story-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .story-grad { position: relative; z-index: 2; padding: 7px; background: linear-gradient(transparent, rgba(0,0,0,0.74)); color: #FFFFFF; font-size: 0.73rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .story-plus { width: 32px; height: 32px; border-radius: 50%; background: var(--green); color: #FFFFFF; border: 3px solid #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.05rem; margin: 0 auto 4px; }
+
+    .fb-author-row { padding: 11px 12px 7px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .fb-author-link { display: flex; align-items: center; gap: 9px; cursor: pointer; min-width: 0; }
+    .fb-mini-avatar { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; background: var(--green-soft); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; color: var(--green-dark); flex-shrink: 0; }
+    .fb-post-caption { padding: 0 12px 10px; font-size: 0.9rem; overflow-wrap: anywhere; }
+    .fb-post-img { width: 100%; max-height: 380px; object-fit: cover; display: block; border-top: 1px solid #F3F4F6; border-bottom: 1px solid #F3F4F6; }
+    .fb-stats { padding: 7px 12px; font-size: 0.76rem; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .fb-actions { display: grid; grid-template-columns: repeat(3, 1fr); padding: 3px 6px; border-bottom: 1px solid var(--border); }
+    .fb-act-btn { background: transparent; border: none; border-radius: 8px; padding: 8px 4px; font-size: 0.8rem; font-weight: 700; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
+    .fb-act-btn:hover, .fb-act-btn.liked { background: var(--green-soft); color: var(--green-dark); }
+    .fb-comments { padding: 9px 12px 11px; background: #FAFAFA; }
+    .fb-comment-item { font-size: 0.81rem; margin-bottom: 6px; padding: 6px 9px; background: var(--white); border-radius: 8px; border: 1px solid var(--border); overflow-wrap: anywhere; }
+
+    .prof-top-nav { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid var(--border); background: var(--white); gap: 8px; }
+    .prof-back-btn { background: transparent; border: none; font-size: 0.96rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+    .prof-back-btn span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fb-cover { height: 155px; background: linear-gradient(120deg, var(--green), var(--green-deep)); position: relative; background-size: cover; background-position: center; }
+    .cam-badge-btn { position: absolute; right: 10px; bottom: 10px; width: 32px; height: 32px; border-radius: 50%; background: #E5E7EB; color: var(--text); border: 2px solid var(--white); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem; font-weight: 700; }
+    .note-bubble { position: absolute; left: 12px; bottom: 10px; background: var(--white); color: var(--text); border-radius: 14px; padding: 5px 10px; font-size: 0.75rem; font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 155px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fb-profile-bar { padding: 0 13px 13px; }
+    .avatar-wrap { position: relative; width: 92px; height: 92px; margin-top: -42px; margin-bottom: 8px; }
+    .fb-avatar { width: 92px; height: 92px; border-radius: 50%; border: 4px solid var(--white); background: var(--green-soft); object-fit: cover; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.6rem; color: var(--green-dark); }
+    .prof-tabs { display: flex; border-bottom: 1px solid var(--border); margin-top: 10px; }
+    .prof-tab { flex: 1; padding: 9px 4px; background: transparent; border: none; font-weight: 700; font-size: 0.82rem; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; }
+    .prof-tab.active { color: var(--green-dark); border-bottom-color: var(--green); }
+    .lock-banner { background: #F3F4F6; border-radius: 10px; padding: 9px 11px; margin: 10px 0; font-size: 0.8rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+    /* Messagerie */
+    .inbox-shell { max-width: 720px; margin: 0 auto; background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; position: relative; min-height: 520px; }
+    .inbox-header { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-bottom: 1px solid var(--border); background: var(--white); }
+    .inbox-title-btn { background: transparent; border: none; font-size: 1.08rem; font-weight: 800; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+    .inbox-notes-row { display: flex; gap: 14px; padding: 16px 14px 12px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid #F3F4F6; align-items: flex-end; }
+    .inbox-notes-row::-webkit-scrollbar { display: none; }
+    .note-avatar-col { width: 64px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; position: relative; cursor: pointer; }
+    .note-cloud { position: relative; background: #F3F4F6; color: var(--muted); font-size: 0.68rem; font-weight: 600; padding: 4px 7px; border-radius: 10px; margin-bottom: 5px; max-width: 76px; text-align: center; line-height: 1.2; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+    .note-ring { position: relative; width: 54px; height: 54px; }
+    .note-ring img, .note-ring .note-init { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; background: var(--green-soft); display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--green-dark); }
+    .online-dot { position: absolute; right: 1px; bottom: 1px; width: 13px; height: 13px; border-radius: 50%; background: var(--green); border: 2px solid var(--white); }
+    .note-label { font-size: 0.72rem; color: var(--text); margin-top: 4px; max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
+
+    .conv-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; cursor: pointer; }
+    .conv-row:hover { background: #F9FAFB; }
+    .conv-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .conv-avatar-wrap { position: relative; width: 52px; height: 52px; flex-shrink: 0; }
+    .conv-avatar { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; background: var(--green-soft); display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--green-dark); }
+    .conv-time-pill { position: absolute; left: 50%; bottom: -4px; transform: translateX(-50%); background: #E5E7EB; color: var(--text); font-size: 0.64rem; font-weight: 700; padding: 0 5px; border-radius: 8px; white-space: nowrap; }
+    .conv-name { font-size: 0.92rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .conv-preview { font-size: 0.8rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .conv-preview.unread { color: var(--text); font-weight: 800; }
+    .unread-circle { width: 20px; height: 20px; border-radius: 50%; background: #EF4444; color: var(--white); font-size: 0.7rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .read-check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--blue-msg); color: var(--blue-msg); font-size: 0.65rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    .fab-compose { position: fixed; right: 18px; bottom: 22px; width: 50px; height: 50px; border-radius: 50%; background: var(--blue-msg); color: var(--white); border: none; font-size: 1.5rem; font-weight: 700; box-shadow: 0 6px 18px rgba(0, 132, 255, 0.35); cursor: pointer; z-index: 90; display: flex; align-items: center; justify-content: center; }
+
+    .chat-shell { max-width: 720px; margin: 0 auto; background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-height: 540px; }
+    .chat-top { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid var(--border); background: var(--white); }
+    .chat-body { flex: 1; padding: 12px; overflow-y: auto; max-height: 410px; display: flex; flex-direction: column; gap: 6px; background: var(--white); }
+    .msg-stamp { text-align: center; font-size: 0.7rem; color: var(--muted); font-weight: 600; margin: 6px 0 2px; }
+    .bubble-row { display: flex; align-items: flex-end; gap: 7px; }
+    .bubble-row.me { justify-content: flex-end; }
+    .bubble-row.them { justify-content: flex-start; }
+    .msg-bubble { max-width: 74%; padding: 8px 13px; border-radius: 18px; font-size: 0.88rem; line-height: 1.38; overflow-wrap: anywhere; }
+    .bubble-row.me .msg-bubble { background: var(--blue-msg); color: var(--white); border-bottom-right-radius: 5px; }
+    .bubble-row.them .msg-bubble { background: #F0F2F5; color: var(--text); border-bottom-left-radius: 5px; }
+    .msg-react-tag { align-self: flex-start; margin-left: 34px; margin-top: -3px; background: var(--white); border: 1px solid var(--border); border-radius: 999px; padding: 1px 6px; font-size: 0.72rem; cursor: pointer; }
+    .chat-composer { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-top: 1px solid var(--border); background: var(--white); }
+    .chat-input-pill { flex: 1; background: #F0F2F5; border: none; border-radius: 999px; padding: 9px 14px; font-size: 0.88rem; margin: 0; outline: none; }
+    .chat-icon-btn { background: transparent; border: none; color: var(--blue-msg); font-weight: 800; font-size: 1.05rem; cursor: pointer; padding: 4px 6px; display: inline-flex; align-items: center; justify-content: center; }
+
+    .dossier-card { background: #F9FAFB; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-top: 10px; }
+    .cin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 10px 0; }
+    .cin-box { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 8px; }
+    .cin-box img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-top: 6px; display: block; }
+
+    @media (max-width: 860px) {
+      .catalog-layout { grid-template-columns: 1fr; gap: 12px; }
+    }
+
+    @media (max-width: 720px) {
+      .header-row { grid-template-columns: auto 1fr; gap: 8px; padding: 8px 10px; }
+      .brand svg { width: 148px; height: 34px; }
+      .header-controls { gap: 5px; }
+      .icon-btn { padding: 7px 9px; font-size: 0.78rem; }
+      #profileLabel { max-width: 74px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .search-bar { grid-column: 1 / -1; order: 3; width: 100%; padding: 2px 3px 2px 10px; }
+      .search-bar input { padding: 7px 6px; font-size: 0.84rem; }
+      .search-bar button { padding: 7px 12px; font-size: 0.8rem; }
+      .cat-bar-inner { padding: 6px 10px; gap: 6px; }
+      .main { margin: 12px auto; padding: 0 8px; }
+      .promo-hero { padding: 14px; border-radius: 12px; }
+      .promo-hero h1 { font-size: 1.12rem; }
+      .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+      .prod-thumb { height: 106px; }
+      .prod-body { padding: 9px; }
+      .prod-title { font-size: 0.82rem; }
+      .prod-price { font-size: 0.9rem; }
+      .card-box { padding: 12px; border-radius: 10px; }
+    }
+
+    @media (max-width: 380px) {
+      .products-grid { grid-template-columns: 1fr; }
+      #profileLabel { display: none; }
+    }
+
+    .toast { position: fixed; bottom: 14px; right: 14px; left: 14px; max-width: 420px; margin-left: auto; background: var(--text); color: var(--white); border-left: 4px solid var(--orange); padding: 10px 14px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; z-index: 999; display: none; }
+  </style>
+</head>
+<body>
+  <div class="top-strip">
+    <span><b>MADAMARKET</b> • Madagascar achète, Madagascar vend !</span>
+    <span id="channelsStrip"></span>
+  </div>
+
+  <header class="header">
+    <div class="header-row">
+      <div class="brand" onclick="showView('catalog')">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 215 46" width="185" height="40">
+          <rect x="2" y="4" width="38" height="38" rx="9" fill="#16A34A"/>
+          <path d="M12 18h18l-2 15H14l-2-15z" fill="#FFFFFF"/>
+          <path d="M17 18v-3a4 4 0 0 1 8 0v3" fill="none" stroke="#F97316" stroke-width="2.5" stroke-linecap="round"/>
+          <text x="47" y="25" font-family="Arial, sans-serif" font-weight="800" font-size="19" fill="#111827">
+            Mada<tspan fill="#16A34A">Market</tspan>
+          </text>
+          <text x="48" y="38" font-family="Arial, sans-serif" font-weight="700" font-size="7.2" fill="#F97316">
+            MADAGASCAR ACHÈTE, MADAGASCAR VEND !
+          </text>
+        </svg>
+      </div>
+
+      <div class="header-controls">
+        <button class="icon-btn" onclick="showView('messages')" title="Messages">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="badge-num" id="msgBadge">0</span>
+        </button>
+
+        <button class="icon-btn cart-btn" id="nav-cart" onclick="showView('cart')" title="Panier">
+          <svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="badge-num" id="cartCount">0</span>
+        </button>
+
+        <button class="icon-btn profile-btn" id="profileBtn" onclick="toggleProfileMenu(event)" title="Compte et Espaces">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="profileLabel">Compte</span>
+        </button>
+
+        <div class="profile-menu" id="profileMenu">
+          <div class="profile-header">
+            <strong id="menuUserName">Non connecté</strong>
+            <span id="menuUserRole">INVITÉ</span>
+          </div>
+          <button class="menu-action" onclick="selectMenuView('catalog')">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            Catalogue
+          </button>
+          <button class="menu-action" onclick="selectMenuView('community')">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Page Communauté
+          </button>
+          <button class="menu-action" onclick="selectMenuView('messages')">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Messages
+          </button>
+          <button class="menu-action" onclick="openMyProfile()">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Mon Profil
+          </button>
+          <button class="menu-action" id="menuBecomeSellerBtn" style="display:none;" onclick="openBecomeSellerForm()">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Devenir vendeur
+          </button>
+          <button class="menu-action" id="menuSellerBtn" style="display:none;" onclick="selectMenuView('seller')">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M3 7h18l-2 6H5L3 7z"/><path d="M5 13v7h14v-7"/></svg>
+            Tableau Vendeur
+          </button>
+          <button class="menu-action" id="menuAdminBtn" style="display:none;" onclick="selectMenuView('admin')">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Tableau Administrateur
+          </button>
+          <div class="menu-sep"></div>
+          <button class="menu-action" onclick="handleAuthMenuClick()">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span id="menuAuthLabel">Connexion / Inscription</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="search-bar" style="grid-column: 1 / -1;">
+        <svg class="ico" style="color:var(--muted)" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="qInput" placeholder="Rechercher un produit, ville, boutique..." oninput="renderCatalog()" />
+        <button onclick="renderCatalog()">Chercher</button>
+      </div>
+    </div>
+
+    <div class="cat-bar">
+      <div class="cat-bar-inner">
+        <button class="cat-pill active" onclick="pickCat('', this)">Tout</button>
+        <button class="cat-pill" onclick="pickCat('Téléphones & Tablettes', this)">Téléphones &amp; Tablettes</button>
+        <button class="cat-pill" onclick="pickCat('Informatique & Électronique', this)">Informatique</button>
+        <button class="cat-pill" onclick="pickCat('Produits Locaux & Artisanat', this)">Produits Locaux &amp; Artisanat</button>
+        <button class="cat-pill" onclick="pickCat('Alimentation & Épicerie', this)">Alimentation</button>
+        <button class="cat-pill" onclick="pickCat('Mode & Vêtements', this)">Mode &amp; Vêtements</button>
+        <button class="cat-pill" onclick="showView('community')">Communauté</button>
+        <button class="cat-pill" onclick="showView('messages')">Messages</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="view active" id="view-catalog">
+      <div class="promo-hero">
+        <div>
+          <h1>Madagascar achète, Madagascar vend !</h1>
+          <p>Marketplace multi-vendeurs, communauté, profils &amp; messagerie sur PostgreSQL.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn-green" style="background:#0F291A;" onclick="showView('community')">Page Communauté</button>
+          <button class="btn-orange" id="heroBecomeOrSellerBtn" onclick="openBecomeSellerForm()">Devenir vendeur</button>
+        </div>
+      </div>
+
+      <div class="catalog-layout">
+        <aside class="card-box">
+          <div class="box-head">Filtres</div>
+          <div class="f-sec">
+            <label>Catégorie</label>
+            <select id="fCategory" onchange="renderCatalog()">
+              <option value="">Toutes</option>
+              <option value="Téléphones & Tablettes">Téléphones &amp; Tablettes</option>
+              <option value="Informatique & Électronique">Informatique &amp; Électronique</option>
+              <option value="Produits Locaux & Artisanat">Produits Locaux &amp; Artisanat</option>
+              <option value="Alimentation & Épicerie">Alimentation &amp; Épicerie</option>
+              <option value="Mode & Vêtements">Mode &amp; Vêtements</option>
+            </select>
+          </div>
+          <div class="f-sec">
+            <label>Ville</label>
+            <select id="fCity" onchange="renderCatalog()"></select>
+          </div>
+          <div class="f-sec">
+            <label>Prix (Ariary)</label>
+            <input type="number" id="fMinPrice" placeholder="Prix min (Ar)" oninput="renderCatalog()" />
+            <input type="number" id="fMaxPrice" placeholder="Prix max (Ar)" oninput="renderCatalog()" />
+          </div>
+          <div class="f-sec">
+            <label>Note minimum</label>
+            <select id="fRating" onchange="renderCatalog()">
+              <option value="0">Toutes les notes</option>
+              <option value="4.5">4.5 et +</option>
+              <option value="4">4.0 et +</option>
+            </select>
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;margin-bottom:6px;">
+            <input type="checkbox" id="fStock" style="width:auto;margin:0;" onchange="renderCatalog()" /> En stock uniquement
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;">
+            <input type="checkbox" id="fPromo" style="width:auto;margin:0;" onchange="renderCatalog()" /> Promotions uniquement
+          </label>
+        </aside>
+
+        <div>
+          <div class="card-box" style="padding:10px 12px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;">
+            <strong>Catalogue produits</strong>
+            <select id="fSort" onchange="renderCatalog()" style="width:auto;margin:0;">
+              <option value="popular">Populaires</option>
+              <option value="sales">Meilleures ventes</option>
+              <option value="price_asc">Prix croissant</option>
+              <option value="price_desc">Prix décroissant</option>
+            </select>
+          </div>
+          <div class="products-grid" id="catalogGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-community">
+      <div class="fb-shell">
+        <div class="comm-topbar">
+          <div class="comm-tabs">
+            <button class="comm-tab active" id="commTabFeed" onclick="switchCommTab('feed')">Fil</button>
+            <button class="comm-tab" id="commTabMembers" onclick="switchCommTab('members')">Membres</button>
+          </div>
+          <button class="btn-outline" onclick="showView('messages')">Messages</button>
+        </div>
+
+        <div id="commFeedPanel">
+          <div class="fb-card">
+            <div class="composer-row">
+              <div id="composerAvatarWrap"></div>
+              <button type="button" class="composer-pill" onclick="document.getElementById('postCaption').focus()">À quoi pensez-vous ?</button>
+              <button type="button" class="photo-shortcut" onclick="document.getElementById('postFile').click()">
+                <svg class="ico" style="color:var(--green)" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                Photo
+              </button>
+            </div>
+            <form onsubmit="createPost(event)" style="padding:0 12px 12px;">
+              <textarea id="postCaption" rows="2" placeholder="Écrire une publication..."></textarea>
+              <input type="file" id="postFile" accept="image/*" style="display:none;" onchange="fileToDataUrl(this, 'postPhotoUrl')" />
+              <input type="text" id="postPhotoUrl" placeholder="URL photo ou fichier sélectionné via Photo" />
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+                <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;margin:0;">
+                  <input type="checkbox" id="postAnon" style="width:auto;margin:0;" /> Publier de façon anonyme
+                </label>
+                <button type="submit" class="btn-green">Publier</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="fb-card">
+            <div class="stories-strip" id="storiesStrip"></div>
+          </div>
+
+          <div class="fb-card" id="storyComposerBox" style="display:none;padding:12px;">
+            <div class="box-head" style="margin-bottom:8px;">Ajouter une photo récente / story</div>
+            <form onsubmit="createStory(event)">
+              <input type="file" accept="image/*" onchange="fileToDataUrl(this, 'storyPhotoUrl')" />
+              <input type="text" id="storyPhotoUrl" placeholder="URL ou fichier image" required />
+              <input type="text" id="storyCaption" placeholder="Légende courte (optionnel)" />
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="submit" class="btn-green">Publier la story</button>
+                <button type="button" class="btn-outline" onclick="document.getElementById('storyComposerBox').style.display='none'">Fermer</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="communityFeedBox"></div>
+        </div>
+
+        <div id="commMembersPanel" style="display:none;">
+          <div class="card-box">
+            <div class="box-head">Membres de la communauté</div>
+            <div id="membersListBox"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-profile">
+      <div class="fb-shell">
+        <div class="fb-card">
+          <div class="prof-top-nav">
+            <button type="button" class="prof-back-btn" onclick="showView('community')">
+              <span>&lt;</span>
+              <span id="profTopName">Profil</span>
+            </button>
+            <div style="display:flex;gap:6px;flex-shrink:0;">
+              <button type="button" class="btn-outline" onclick="copyProfileLink()">Lien</button>
+              <button type="button" class="btn-outline" id="profLockBtn" onclick="toggleProfileLock()" style="display:none;">Verrouiller</button>
+            </div>
+          </div>
+
+          <div class="fb-cover" id="fbCoverEl">
+            <div class="note-bubble" id="fbNoteBubble" onclick="editQuickNote()">Partagez une note...</div>
+            <button type="button" class="cam-badge-btn" title="Changer photo de couverture" id="coverCamBtn" onclick="document.getElementById('coverFilePick').click()">📷</button>
+            <input type="file" id="coverFilePick" accept="image/*" style="display:none;" onchange="quickUploadMedia(this, 'coverUrl')" />
+          </div>
+
+          <div class="fb-profile-bar">
+            <div class="avatar-wrap">
+              <div class="fb-avatar" id="fbAvatarEl"></div>
+              <button type="button" class="cam-badge-btn" style="right:-2px;bottom:-2px;" title="Changer photo de profil" id="avatarCamBtn" onclick="document.getElementById('avatarFilePick').click()">📷</button>
+              <input type="file" id="avatarFilePick" accept="image/*" style="display:none;" onchange="quickUploadMedia(this, 'avatarUrl')" />
+            </div>
+
+            <h2 id="fbProfileName" style="font-size:1.22rem;font-weight:800;overflow-wrap:anywhere;"></h2>
+            <p id="fbProfileFriends" style="font-size:0.82rem;color:var(--muted);font-weight:600;"></p>
+            <p id="fbProfileLinkText" style="font-size:0.8rem;font-weight:700;margin:4px 0;overflow-wrap:anywhere;"></p>
+            <p id="fbProfileBio" style="font-size:0.85rem;margin-bottom:10px;overflow-wrap:anywhere;"></p>
+
+            <div id="profActionButtons" style="display:flex;flex-direction:column;gap:8px;"></div>
+
+            <div class="lock-banner" id="lockInfoBanner">
+              <div style="min-width:0;">
+                <strong id="lockBannerTitle">Profil public</strong>
+                <div style="font-size:0.74rem;color:var(--muted);">Lien partageable actif</div>
+              </div>
+              <button type="button" class="btn-outline" onclick="copyProfileLink()">Copier</button>
+            </div>
+
+            <div class="prof-tabs">
+              <button type="button" class="prof-tab active" id="ptab-all" onclick="switchProfileTab('all')">Tous</button>
+              <button type="button" class="prof-tab" id="ptab-photos" onclick="switchProfileTab('photos')">Photos</button>
+              <button type="button" class="prof-tab" id="ptab-shops" onclick="switchProfileTab('shops')">Boutiques</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulaire Devenir vendeur (CLIENT connecté) -->
+        <div class="card-box" id="becomeSellerCard" style="display:none;">
+          <div class="box-head">Devenir vendeur — Dossier complet</div>
+          <div id="myApplicationStatusBox" style="margin-bottom:10px;"></div>
+          <form onsubmit="submitSellerApplication(event)">
+            <label style="font-size:0.79rem;font-weight:700;">Nom complet</label>
+            <input type="text" id="appFullName" placeholder="Nom complet" required />
+
+            <label style="font-size:0.79rem;font-weight:700;">Numéro de téléphone</label>
+            <input type="tel" id="appPhone" placeholder="Numéro de téléphone" required />
+
+            <label style="font-size:0.79rem;font-weight:700;">Adresse complète</label>
+            <input type="text" id="appAddress" placeholder="Quartier, rue, ville..." required />
+
+            <label style="font-size:0.79rem;font-weight:700;">Nom de la boutique &amp; Ville</label>
+            <input type="text" id="appShopName" placeholder="Nom de votre boutique" required />
+            <select id="appShopCity"></select>
+
+            <label style="font-size:0.79rem;font-weight:700;">Numéro CIN (optionnel)</label>
+            <input type="text" id="appCinNumber" placeholder="Numéro CIN" />
+
+            <label style="font-size:0.79rem;font-weight:700;">Photo CIN recto</label>
+            <input type="file" accept="image/*" onchange="fileToDataUrl(this, 'appCinFrontUrl')" />
+            <input type="text" id="appCinFrontUrl" placeholder="Photo CIN recto (fichier ou URL)" required />
+
+            <label style="font-size:0.79rem;font-weight:700;">Photo CIN verso</label>
+            <input type="file" accept="image/*" onchange="fileToDataUrl(this, 'appCinBackUrl')" />
+            <input type="text" id="appCinBackUrl" placeholder="Photo CIN verso (fichier ou URL)" required />
+
+            <label style="font-size:0.79rem;font-weight:700;">Informations complémentaires</label>
+            <textarea id="appNotes" rows="2" placeholder="Activité, produits proposés..."></textarea>
+
+            <button type="submit" class="btn-orange" style="width:100%;">Envoyer ma demande vendeur</button>
+          </form>
+        </div>
+
+        <div class="card-box" id="editProfileCard" style="display:none;">
+          <div class="box-head">Modifier le profil</div>
+          <form onsubmit="saveProfile(event)">
+            <label style="font-size:0.79rem;font-weight:700;">Nom complet</label>
+            <input type="text" id="profName" required />
+
+            <label style="font-size:0.79rem;font-weight:700;">Lieu de vie</label>
+            <input type="text" id="profCityLoc" placeholder="Mahajanga, Mahajanga, Madagascar" />
+
+            <label style="font-size:0.79rem;font-weight:700;">Date d'anniversaire</label>
+            <input type="text" id="profBirthday" placeholder="29 avril" />
+
+            <label style="font-size:0.79rem;font-weight:700;">Bio</label>
+            <input type="text" id="profBio" placeholder="Bio" />
+
+            <label style="font-size:0.79rem;font-weight:700;">Téléphone</label>
+            <input type="text" id="profPhone" required />
+
+            <label style="font-size:0.79rem;font-weight:700;">Email</label>
+            <input type="email" id="profEmail" required />
+
+            <button type="submit" class="btn-green" style="width:100%;">Enregistrer les modifications</button>
+          </form>
+        </div>
+
+        <div class="card-box" id="profileTabAll">
+          <div class="box-head">Informations personnelles</div>
+          <div class="list-line"><span>Lieu de vie</span><strong id="infoCityLoc">—</strong></div>
+          <div class="list-line"><span>Anniversaire</span><strong id="infoBirthday">—</strong></div>
+          <div class="list-line"><span>Lien de profil</span><strong id="infoLink" style="overflow-wrap:anywhere;">—</strong></div>
+          <div id="profilePostsBox" style="margin-top:12px;"></div>
+        </div>
+
+        <div class="card-box" id="profileTabPhotos" style="display:none;">
+          <div class="box-head">Photos</div>
+          <div id="profilePhotosGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;"></div>
+        </div>
+
+        <div class="card-box" id="profileTabShops" style="display:none;">
+          <div class="box-head">Boutiques &amp; Commandes</div>
+          <div id="profileShopsBox"></div>
+          <div id="clientOrdersBox" style="margin-top:10px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-messages">
+      <div class="inbox-shell" id="inboxView">
+        <div class="inbox-header">
+          <button type="button" class="inbox-title-btn" onclick="showView('community')">
+            <span>&lt;</span>
+            <span>Messages</span>
+          </button>
+          <div style="display:flex;gap:12px;align-items:center;">
+            <button type="button" class="chat-icon-btn" title="Nouvelle note" onclick="editQuickNote()">⚙</button>
+            <button type="button" class="chat-icon-btn" title="Rechercher" onclick="toggleInboxSearch()">🔍</button>
+          </div>
+        </div>
+
+        <div id="inboxSearchWrap" style="display:none;padding:8px 14px 0;">
+          <input type="text" id="inboxSearchInput" placeholder="Rechercher une conversation..." oninput="renderInboxList()" style="margin:0;" />
+        </div>
+
+        <div class="inbox-notes-row" id="inboxNotesRow"></div>
+        <div id="inboxConvList"></div>
+
+        <button type="button" class="fab-compose" title="Nouveau message" onclick="openFirstOrSelectPartner()">+</button>
+      </div>
+
+      <div class="chat-shell" id="chatThreadView" style="display:none;">
+        <div class="chat-top">
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+            <button type="button" class="prof-back-btn" onclick="backToInbox()">&lt;</button>
+            <div id="chatPartnerAvatarWrap"></div>
+            <div style="min-width:0;">
+              <div id="chatPartnerName" style="font-weight:800;font-size:0.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+              <div id="chatPartnerStatus" style="font-size:0.72rem;color:var(--muted);">En ligne</div>
+            </div>
+          </div>
+          <button type="button" class="btn-outline" id="chatPartnerProfileBtn">Profil</button>
+        </div>
+
+        <div class="chat-body" id="chatMessagesStream"></div>
+
+        <form class="chat-composer" onsubmit="sendDirectMessage(event)">
+          <input type="file" id="msgFile" accept="image/*" style="display:none;" onchange="fileToDataUrl(this, 'msgPhotoUrl')" />
+          <input type="hidden" id="msgPhotoUrl" />
+          <button type="button" class="chat-icon-btn" title="Photo" onclick="document.getElementById('msgFile').click()">🖼</button>
+          <input type="text" id="msgInput" class="chat-input-pill" placeholder="Message" />
+          <button type="submit" class="chat-icon-btn" title="Envoyer">➤</button>
+          <button type="button" class="chat-icon-btn" title="J'aime" onclick="sendQuickThumb()">👍</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="view" id="view-cart">
+      <div class="grid-2">
+        <div class="card-box">
+          <div class="box-head">Mon Panier</div>
+          <div id="cartItemsBox"></div>
+        </div>
+
+        <div class="card-box">
+          <div class="box-head">Livraison &amp; Paiement</div>
+          <label style="font-size:0.8rem;font-weight:700;">Destinataire &amp; Téléphone</label>
+          <input type="text" id="shipName" placeholder="Nom complet" />
+          <input type="text" id="shipPhone" placeholder="Numéro de téléphone" />
+
+          <label style="font-size:0.8rem;font-weight:700;">Ville &amp; Mode de livraison</label>
+          <select id="shipCity" onchange="renderCart()"></select>
+          <select id="shipType" onchange="renderCart()">
+            <option value="DOMICILE">Livraison à domicile</option>
+            <option value="POINT_RELAIS">Point relais</option>
+          </select>
+          <input type="text" id="shipAddress" placeholder="Quartier &amp; adresse complète" />
+
+          <label style="font-size:0.8rem;font-weight:700;">Moyen de paiement</label>
+          <select id="payMethod" onchange="updatePayBox()"></select>
+          <div class="pay-box" id="payInfoBox"></div>
+
+          <div id="proofBox">
+            <label style="font-size:0.8rem;font-weight:700;">Référence transaction &amp; Preuve</label>
+            <input type="text" id="txRef" placeholder="Référence de transaction" />
+            <input type="file" id="proofFile" accept="image/*,.pdf" />
+          </div>
+
+          <div id="cartTotals" style="border-top:1px solid var(--border);padding-top:10px;margin-bottom:10px;"></div>
+          <button class="btn-orange" style="width:100%;" onclick="placeOrder()">Valider la commande</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-auth">
+      <div class="card-box" style="max-width:460px;margin:0 auto;">
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Connexion</button>
+          <button type="button" class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Inscription</button>
+        </div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <label style="font-size:0.79rem;font-weight:700;">Email ou Numéro de téléphone</label>
+          <input type="text" id="authEmail" placeholder="Email ou téléphone" required />
+          <label style="font-size:0.79rem;font-weight:700;">Mot de passe</label>
+          <input type="password" id="authPass" placeholder="Mot de passe" required />
+          <button type="submit" class="btn-orange" style="width:100%;margin-top:4px;">Se connecter</button>
+        </form>
+
+        <form id="registerForm" style="display:none;" onsubmit="handleRegister(event)">
+          <label style="font-size:0.79rem;font-weight:700;">Nom complet</label>
+          <input type="text" id="regName" placeholder="Nom complet" required />
+          <label style="font-size:0.79rem;font-weight:700;">Numéro de téléphone</label>
+          <input type="tel" id="regPhone" placeholder="Numéro de téléphone" required />
+          <label style="font-size:0.79rem;font-weight:700;">Adresse email</label>
+          <input type="email" id="regEmail" placeholder="Adresse email" required />
+          <label style="font-size:0.79rem;font-weight:700;">Mot de passe</label>
+          <input type="password" id="regPass" placeholder="Mot de passe" required />
+          <button type="submit" class="btn-green" style="width:100%;margin-top:4px;">Créer mon compte client</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- TABLEAU VENDEUR (réservé VENDEUR / ADMINISTRATEUR) -->
+    <section class="view" id="view-seller">
+      <div id="sellerGuardBox" class="card-box" style="display:none;">
+        <div class="box-head">Accès réservé aux vendeurs</div>
+        <p style="color:var(--muted);margin-bottom:10px;">Votre compte est actuellement un compte client. Cliquez sur « Devenir vendeur » et faites valider votre dossier par l'administrateur.</p>
+        <button class="btn-orange" onclick="openBecomeSellerForm()">Devenir vendeur</button>
+      </div>
+
+      <div id="sellerActivePanel" style="display:none;">
+        <div class="card-box" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
+          <div>
+            <h2 id="sellerShopTitle" style="color:var(--green-dark);font-size:1.15rem;"></h2>
+            <p id="sellerShopMeta" style="font-size:0.82rem;color:var(--muted);"></p>
+          </div>
+          <button class="btn-orange" onclick="requestWithdrawal()">Demander un retrait</button>
+        </div>
+
+        <div class="kpi-row" id="sellerStats"></div>
+
+        <div class="card-box">
+          <div class="box-head">Ajouter un produit</div>
+          <form onsubmit="addSellerProduct(event)" class="grid-2">
+            <div>
+              <input type="text" id="spName" placeholder="Nom du produit" required />
+              <select id="spCat">
+                <option value="Téléphones & Tablettes">Téléphones &amp; Tablettes</option>
+                <option value="Informatique & Électronique">Informatique &amp; Électronique</option>
+                <option value="Produits Locaux & Artisanat">Produits Locaux &amp; Artisanat</option>
+                <option value="Alimentation & Épicerie">Alimentation &amp; Épicerie</option>
+                <option value="Mode & Vêtements">Mode &amp; Vêtements</option>
+              </select>
+              <input type="number" id="spPrice" placeholder="Prix en Ariary" required />
+              <input type="number" id="spPromo" placeholder="Prix promo (optionnel)" />
+            </div>
+            <div>
+              <input type="number" id="spStock" placeholder="Quantité en stock" required />
+              <select id="spCity"></select>
+              <input type="text" id="spEmoji" placeholder="Icône (leaf, phone, bag, box)" value="box" />
+              <button type="submit" class="btn-orange" style="width:100%;">Publier le produit</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="grid-2">
+          <div class="card-box">
+            <div class="box-head">Produits de la boutique</div>
+            <div id="sellerProductsBox"></div>
+          </div>
+          <div class="card-box">
+            <div class="box-head">Sous-commandes vendeur</div>
+            <div id="sellerSubOrdersBox"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABLEAU ADMINISTRATEUR (réservé ADMINISTRATEUR) -->
+    <section class="view" id="view-admin">
+      <div id="adminGuardBox" class="card-box" style="display:none;">
+        <div class="box-head">Accès restreint</div>
+        <p style="color:var(--muted);">Seul l'administrateur peut accéder au tableau administrateur.</p>
+      </div>
+
+      <div id="adminPanelContent" style="display:none;">
+        <div class="box-head" style="font-size:1.15rem;color:var(--green-dark);">Tableau Administrateur</div>
+        <div class="kpi-row" id="adminStats"></div>
+
+        <!-- Dossiers vendeurs classés par sélection du nom -->
+        <div class="card-box">
+          <div class="box-head">Dossiers de demande vendeur (sélectionner un nom)</div>
+          <label style="font-size:0.8rem;font-weight:700;">Nom du vendeur</label>
+          <select id="sellerAppSelect" onchange="renderSelectedApplication()">
+            <option value="">-- Choisir un nom de vendeur --</option>
+          </select>
+          <div id="selectedApplicationDetail"></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card-box">
+            <div class="box-head">Commission globale (%)</div>
+            <div style="display:flex;gap:8px;">
+              <input type="number" step="0.5" id="adminCommInput" style="margin:0;" />
+              <button class="btn-orange" onclick="updateCommission()">Enregistrer</button>
+            </div>
+          </div>
+
+          <div class="card-box">
+            <div class="box-head">Frais de livraison par ville (Ar)</div>
+            <select id="rateCity"></select>
+            <select id="rateType">
+              <option value="DOMICILE">DOMICILE</option>
+              <option value="POINT_RELAIS">POINT_RELAIS</option>
+            </select>
+            <input type="number" id="rateFee" placeholder="Montant en Ariary" />
+            <button class="btn-green" onclick="saveDeliveryRate()">Mettre à jour</button>
+          </div>
+        </div>
+
+        <div class="card-box">
+          <div class="box-head">Numéros &amp; comptes de paiement</div>
+          <div id="adminChannelsBox"></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card-box">
+            <div class="box-head">Boutiques vendeurs</div>
+            <div id="adminShopsBox"></div>
+          </div>
+          <div class="card-box">
+            <div class="box-head">Paiements &amp; preuves</div>
+            <div id="adminPaymentsBox"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toastBox"></div>
+
+  <script>
+    const API_BASE = 'http://localhost:5000/api';
+    const STORAGE_KEY = 'madamarket_session_user_v1';
+
+    const state = {
+      currentUser: null,
+      viewedProfileId: null,
+      viewedProfileData: null,
+      chatWithUserId: null,
+      chatMessages: [],
+      commissionRate: 5,
+      deliveryRates: [],
+      paymentChannels: [],
+      products: [],
+      cart: [],
+      orders: [],
+      sellerOrders: [],
+      shops: [],
+      payments: [],
+      posts: [],
+      stories: [],
+      members: [],
+      sellerApplications: []
+    };
+
+    function persistSessionUser(user) {
+      state.currentUser = user || null;
+      if (user) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+      syncUserUi();
+    }
+
+    function restoreSessionUser() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          state.currentUser = JSON.parse(raw);
+        }
+      } catch (e) {
+        state.currentUser = null;
+      }
+    }
+
+    function isAdmin() {
+      return state.currentUser?.role === 'ADMINISTRATEUR';
+    }
+
+    function isSellerOrAdmin() {
+      return state.currentUser?.role === 'VENDEUR' || state.currentUser?.role === 'ADMINISTRATEUR';
+    }
+
+    function fileToDataUrl(input, targetInputId) {
+      const file = input.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        document.getElementById(targetInputId).value = reader.result;
+        notify('Fichier chargé');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function apiCall(path, options = {}) {
+      const res = await fetch(API_BASE + path, {
+        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+        ...options
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+      return data;
+    }
+
+    function getUniqueCities() {
+      return [...new Set(state.deliveryRates.map(r => r.city))];
+    }
+
+    function getDeliveryFee(city, type) {
+      const found = state.deliveryRates.find(r => r.city === city && r.deliveryType === type);
+      return found ? Number(found.fee) : 0;
+    }
+
+    function populateCitySelects() {
+      const cities = getUniqueCities();
+      const filterCity = document.getElementById('fCity');
+      const curFilter = filterCity.value;
+      filterCity.innerHTML = '<option value="">Toutes les villes</option>' + cities.map(c => `<option value="${c}">${c}</option>`).join('');
+      filterCity.value = curFilter;
+
+      const shipCity = document.getElementById('shipCity');
+      const curShip = shipCity.value;
+      shipCity.innerHTML = cities.map(c => {
+        const dom = getDeliveryFee(c, 'DOMICILE');
+        const rel = getDeliveryFee(c, 'POINT_RELAIS');
+        return `<option value="${c}">${c} (Domicile ${formatAr(dom)} / Relais ${formatAr(rel)})</option>`;
+      }).join('');
+      if (curShip && cities.includes(curShip)) shipCity.value = curShip;
+
+      ['appShopCity', 'spCity', 'rateCity'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        const prev = sel.value;
+        sel.innerHTML = cities.map(c => `<option value="${c}">${c}</option>`).join('');
+        if (prev && cities.includes(prev)) sel.value = prev;
+      });
+    }
+
+    function populatePaymentSelect() {
+      const sel = document.getElementById('payMethod');
+      const prev = sel.value;
+      sel.innerHTML = state.paymentChannels.map(ch => `<option value="${ch.code}">${ch.label}</option>`).join('');
+      if (prev && state.paymentChannels.some(c => c.code === prev)) sel.value = prev;
+
+      document.getElementById('channelsStrip').innerHTML = state.paymentChannels
+        .filter(c => c.requiresProof)
+        .map(c => `<b>${c.label}</b>: ${c.accountNumber}`)
+        .join(' • ');
+    }
+
+    function syncUserUi() {
+      const u = state.currentUser;
+      const becomeBtn = document.getElementById('menuBecomeSellerBtn');
+      const sellerBtn = document.getElementById('menuSellerBtn');
+      const adminBtn = document.getElementById('menuAdminBtn');
+      const heroBtn = document.getElementById('heroBecomeOrSellerBtn');
+
+      if (u) {
+        document.getElementById('profileLabel').textContent = u.fullName;
+        document.getElementById('menuUserName').textContent = u.fullName;
+        document.getElementById('menuUserRole').textContent = u.role;
+        document.getElementById('menuAuthLabel').textContent = 'Déconnexion';
+        if (!document.getElementById('shipName').value) document.getElementById('shipName').value = u.fullName;
+        if (!document.getElementById('shipPhone').value) document.getElementById('shipPhone').value = u.phone || '';
+
+        becomeBtn.style.display = u.role === 'CLIENT' ? 'flex' : 'none';
+        sellerBtn.style.display = isSellerOrAdmin() ? 'flex' : 'none';
+        adminBtn.style.display = isAdmin() ? 'flex' : 'none';
+
+        if (u.role === 'CLIENT') {
+          heroBtn.textContent = 'Devenir vendeur';
+          heroBtn.onclick = () => openBecomeSellerForm();
+        } else if (isSellerOrAdmin()) {
+          heroBtn.textContent = 'Tableau Vendeur';
+          heroBtn.onclick = () => showView('seller');
+        }
+      } else {
+        document.getElementById('profileLabel').textContent = 'Compte';
+        document.getElementById('menuUserName').textContent = 'Non connecté';
+        document.getElementById('menuUserRole').textContent = 'INVITÉ';
+        document.getElementById('menuAuthLabel').textContent = 'Connexion / Inscription';
+        becomeBtn.style.display = 'none';
+        sellerBtn.style.display = 'none';
+        adminBtn.style.display = 'none';
+        heroBtn.textContent = 'Devenir vendeur';
+        heroBtn.onclick = () => openBecomeSellerForm();
+      }
+    }
+
+    async function syncFromDb() {
+      try {
+        const qUser = state.currentUser ? `?userId=${state.currentUser.id}` : '';
+        const data = await apiCall('/bootstrap' + qUser);
+        state.commissionRate = data.commissionRate;
+        state.deliveryRates = data.deliveryRates || [];
+        state.paymentChannels = data.paymentChannels || [];
+        state.products = data.products || [];
+        state.orders = data.orders || [];
+        state.sellerOrders = data.sellerOrders || [];
+        state.shops = data.shops || [];
+        state.payments = data.payments || [];
+        state.posts = data.posts || [];
+        state.stories = data.stories || [];
+        state.members = data.members || [];
+        state.sellerApplications = data.sellerApplications || [];
+
+        if (state.currentUser) {
+          const freshMe = state.members.find(m => Number(m.id) === Number(state.currentUser.id));
+          if (freshMe) {
+            persistSessionUser({ ...state.currentUser, role: freshMe.role, fullName: freshMe.fullName, avatarUrl: freshMe.avatarUrl, coverUrl: freshMe.coverUrl, noteText: freshMe.noteText, cityLocation: freshMe.cityLocation, birthday: freshMe.birthday, isProfileLocked: freshMe.isProfileLocked, bio: freshMe.bio });
+          }
+        }
+
+        document.getElementById('msgBadge').textContent = data.unreadMessages || 0;
+        populateCitySelects();
+        populatePaymentSelect();
+        updatePayBox();
+      } catch (e) {
+        notify('API PostgreSQL hors ligne : démarrer le backend sur le port 5000');
+      }
+      renderCatalog();
+    }
+
+    function prodSvg(kind) {
+      if (kind === 'phone') return '<svg class="ico-lg" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
+      if (kind === 'leaf') return '<svg class="ico-lg" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>';
+      if (kind === 'bag') return '<svg class="ico-lg" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>';
+      return '<svg class="ico-lg" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+    }
+
+    function formatAr(n) {
+      return new Intl.NumberFormat('fr-MG').format(Math.round(Number(n || 0))) + ' Ar';
+    }
+
+    function notify(msg) {
+      const el = document.getElementById('toastBox');
+      el.textContent = msg;
+      el.style.display = 'block';
+      clearTimeout(window._t);
+      window._t = setTimeout(() => { el.style.display = 'none'; }, 2800);
+    }
+
+    function toggleProfileMenu(e) {
+      e.stopPropagation();
+      const menu = document.getElementById('profileMenu');
+      const btn = document.getElementById('profileBtn');
+      const next = !menu.classList.contains('open');
+      menu.classList.toggle('open', next);
+      btn.classList.toggle('open', next);
+    }
+
+    document.addEventListener('click', () => {
+      document.getElementById('profileMenu').classList.remove('open');
+      document.getElementById('profileBtn').classList.remove('open');
+    });
+
+    function selectMenuView(viewName) {
+      document.getElementById('profileMenu').classList.remove('open');
+      document.getElementById('profileBtn').classList.remove('open');
+      showView(viewName);
+    }
+
+    function openMyProfile() {
+      document.getElementById('profileMenu').classList.remove('open');
+      document.getElementById('profileBtn').classList.remove('open');
+      if (!state.currentUser) {
+        notify('Connectez-vous pour accéder à votre profil');
+        return showView('auth');
+      }
+      openUserProfile(state.currentUser.id);
+    }
+
+    async function openBecomeSellerForm() {
+      document.getElementById('profileMenu').classList.remove('open');
+      document.getElementById('profileBtn').classList.remove('open');
+      if (!state.currentUser) {
+        notify('Connectez-vous d’abord pour devenir vendeur');
+        return showView('auth');
+      }
+      state.viewedProfileId = Number(state.currentUser.id);
+      await showView('profile');
+      const card = document.getElementById('becomeSellerCard');
+      card.style.display = 'block';
+      document.getElementById('appFullName').value = state.currentUser.fullName || '';
+      document.getElementById('appPhone').value = state.currentUser.phone || '';
+      card.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function handleAuthMenuClick() {
+      document.getElementById('profileMenu').classList.remove('open');
+      document.getElementById('profileBtn').classList.remove('open');
+      if (state.currentUser) {
+        persistSessionUser(null);
+        notify('Déconnecté');
+        showView('catalog');
+      } else {
+        showView('auth');
+      }
+    }
+
+    function switchAuthTab(mode) {
+      document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+      document.getElementById('tabRegister').classList.toggle('active', mode === 'register');
+      document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
+      document.getElementById('registerForm').style.display = mode === 'register' ? 'block' : 'none';
+    }
+
+    function pickCat(cat, el) {
+      document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
+      if (el) el.classList.add('active');
+      document.getElementById('fCategory').value = cat;
+      showView('catalog');
+    }
+
+    async function showView(viewName) {
+      await syncFromDb();
+
+      if (viewName === 'seller' && !isSellerOrAdmin()) {
+        notify('Accès réservé aux vendeurs');
+      }
+      if (viewName === 'admin' && !isAdmin()) {
+        notify('Accès réservé à l’administrateur');
+      }
+
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById('view-' + viewName).classList.add('active');
+      document.getElementById('nav-cart').classList.toggle('active', viewName === 'cart');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (viewName === 'cart') { updatePayBox(); renderCart(); }
+      if (viewName === 'community') renderCommunity();
+      if (viewName === 'profile') await renderProfileView();
+      if (viewName === 'messages') await renderMessagesView();
+      if (viewName === 'seller') renderSeller();
+      if (viewName === 'admin') renderAdmin();
+    }
+
+    function renderAvatarEl(el, name, avatarUrl) {
+      if (avatarUrl) {
+        el.innerHTML = `<img src="${avatarUrl}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" />`;
+      } else {
+        el.textContent = (name || 'U').charAt(0).toUpperCase();
+      }
+    }
+
+    function renderMiniAvatarHtml(name, avatarUrl, size = 38) {
+      if (avatarUrl) {
+        return `<img src="${avatarUrl}" alt="${name}" class="fb-mini-avatar" style="width:${size}px;height:${size}px;" />`;
+      }
+      return `<div class="fb-mini-avatar" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.42)}px;">${(name || 'U').charAt(0).toUpperCase()}</div>`;
+    }
+
+    function switchCommTab(tab) {
+      document.getElementById('commTabFeed').classList.toggle('active', tab === 'feed');
+      document.getElementById('commTabMembers').classList.toggle('active', tab === 'members');
+      document.getElementById('commFeedPanel').style.display = tab === 'feed' ? 'block' : 'none';
+      document.getElementById('commMembersPanel').style.display = tab === 'members' ? 'block' : 'none';
+    }
+
+    function renderCommunity() {
+      document.getElementById('composerAvatarWrap').innerHTML = state.currentUser
+        ? renderMiniAvatarHtml(state.currentUser.fullName, state.currentUser.avatarUrl)
+        : '<div class="fb-mini-avatar">?</div>';
+
+      const storiesHtml = [
+        `<div class="story-card" onclick="document.getElementById('storyComposerBox').style.display='block'">
+          <div style="padding:10px;text-align:center;">
+            <div class="story-plus">+</div>
+            <div style="font-size:0.72rem;font-weight:800;">Photos récentes</div>
+          </div>
+        </div>`,
+        ...state.stories.map(st => `
+          <div class="story-card" onclick="openUserProfile(${st.userId})">
+            <img src="${st.photoUrl}" alt="Story" class="story-bg" />
+            <div class="story-grad">${st.authorName}</div>
+          </div>
+        `)
+      ].join('');
+      document.getElementById('storiesStrip').innerHTML = storiesHtml;
+
+      document.getElementById('communityFeedBox').innerHTML = renderPostsList(state.posts);
+
+      document.getElementById('membersListBox').innerHTML = state.members.length
+        ? state.members.map(m => `
+          <div class="list-line">
+            <div style="display:flex;align-items:center;gap:10px;cursor:pointer;min-width:0;" onclick="openUserProfile(${m.id})">
+              ${renderMiniAvatarHtml(m.fullName, m.avatarUrl)}
+              <div style="min-width:0;"><strong style="overflow-wrap:anywhere;">${m.fullName}</strong><br><small style="color:var(--muted);">${m.role} • ${m.cityLocation || ''}</small></div>
+            </div>
+            <button class="btn-outline" onclick="startChatWith(${m.id})">Message</button>
+          </div>
+        `).join('')
+        : '<p style="color:var(--muted);">Aucun membre inscrit.</p>';
+    }
+
+    async function createStory(e) {
+      e.preventDefault();
+      if (!state.currentUser) {
+        notify('Connectez-vous pour ajouter une photo récente');
+        return showView('auth');
+      }
+      try {
+        await apiCall('/stories', {
+          method: 'POST',
+          body: JSON.stringify({
+            userId: state.currentUser.id,
+            photoUrl: document.getElementById('storyPhotoUrl').value.trim(),
+            caption: document.getElementById('storyCaption').value.trim()
+          })
+        });
+        document.getElementById('storyPhotoUrl').value = '';
+        document.getElementById('storyCaption').value = '';
+        document.getElementById('storyComposerBox').style.display = 'none';
+        notify('Photo récente publiée');
+        await syncFromDb();
+        renderCommunity();
+      } catch (err) {
+        notify(err.message || 'Erreur story');
+      }
+    }
+
+    async function createPost(e) {
+      e.preventDefault();
+      if (!state.currentUser) {
+        notify('Connectez-vous pour publier');
+        return showView('auth');
+      }
+      try {
+        await apiCall('/posts', {
+          method: 'POST',
+          body: JSON.stringify({
+            userId: state.currentUser.id,
+            caption: document.getElementById('postCaption').value.trim(),
+            photoUrl: document.getElementById('postPhotoUrl').value.trim(),
+            isAnonymous: document.getElementById('postAnon').checked
+          })
+        });
+        document.getElementById('postCaption').value = '';
+        document.getElementById('postPhotoUrl').value = '';
+        document.getElementById('postFile').value = '';
+        document.getElementById('postAnon').checked = false;
+        notify('Publication ajoutée');
+        await syncFromDb();
+        renderCommunity();
+      } catch (err) {
+        notify(err.message || 'Erreur publication');
+      }
+    }
+
+    function renderPostsList(posts) {
+      if (!posts.length) {
+        return '<div class="fb-card"><p style="padding:14px;color:var(--muted);">Aucune publication pour le moment.</p></div>';
+      }
+
+      return posts.map(post => {
+        const isShare = Boolean(post.sharedFromId);
+        const photoSrc = isShare ? post.sharedPhotoUrl : post.photoUrl;
+        const bodyText = post.caption || (isShare ? `Partagé depuis ${post.sharedAuthorName || 'la communauté'}` : '');
+        const displayAuthor = post.isAnonymous ? 'Participant(e) anonyme' : post.authorName;
+        const displayAvatar = post.isAnonymous ? '' : post.authorAvatar;
+
+        return `
+          <div class="fb-card">
+            <div class="fb-author-row">
+              <div class="fb-author-link" onclick="${post.isAnonymous ? '' : `openUserProfile(${post.userId})`}">
+                ${renderMiniAvatarHtml(displayAuthor, displayAvatar)}
+                <div style="min-width:0;">
+                  <strong style="font-size:0.88rem;overflow-wrap:anywhere;">${displayAuthor}</strong>
+                  <div style="font-size:0.72rem;color:var(--muted);">
+                    ${isShare ? `a partagé la publication de ${post.sharedAuthorName || 'un membre'}` : post.authorRole}
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;">
+                ${!post.isAnonymous ? `<button class="btn-outline" onclick="startChatWith(${post.userId})">Message</button>` : ''}
+                ${!post.isAnonymous ? `<button class="btn-outline" onclick="openUserProfile(${post.userId})">Profil</button>` : ''}
+              </div>
+            </div>
+
+            ${bodyText ? `<div class="fb-post-caption">${bodyText}</div>` : ''}
+            ${photoSrc ? `<img src="${photoSrc}" alt="Publication" class="fb-post-img" />` : ''}
+
+            <div class="fb-stats">
+              <span>${post.likesCount} J'aime</span>
+              <span>${post.comments.length} commentaires • ${post.sharesCount} partages</span>
+            </div>
+
+            <div class="fb-actions">
+              <button class="fb-act-btn ${post.likedByMe ? 'liked' : ''}" onclick="toggleLike(${post.id})">J'aime</button>
+              <button class="fb-act-btn" onclick="document.getElementById('cInput-${post.id}').focus()">Commenter</button>
+              <button class="fb-act-btn" onclick="sharePost(${post.id})">Partager</button>
+            </div>
+
+            <div class="fb-comments">
+              ${post.comments.map(c => `
+                <div class="fb-comment-item">
+                  <strong style="cursor:pointer;" onclick="openUserProfile(${c.userId})">${c.authorName}</strong> : ${c.content}
+                </div>
+              `).join('')}
+              <div style="display:flex;gap:6px;margin-top:6px;">
+                <input type="text" id="cInput-${post.id}" placeholder="Écrire un commentaire..." style="margin:0;" />
+                <button class="btn-green" onclick="addComment(${post.id})">Envoyer</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function toggleLike(postId) {
+      if (!state.currentUser) {
+        notify('Connectez-vous pour aimer');
+        return showView('auth');
+      }
+      try {
+        await apiCall(`/posts/${postId}/like`, { method: 'POST', body: JSON.stringify({ userId: state.currentUser.id }) });
+        await syncFromDb();
+        if (document.getElementById('view-profile').classList.contains('active')) renderProfileView();
+        else renderCommunity();
+      } catch (err) {
+        notify(err.message || 'Erreur');
+      }
+    }
+
+    async function addComment(postId) {
+      if (!state.currentUser) {
+        notify('Connectez-vous pour commenter');
+        return showView('auth');
+      }
+      const input = document.getElementById(`cInput-${postId}`);
+      const content = input.value.trim();
+      if (!content) return;
+      try {
+        await apiCall(`/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ userId: state.currentUser.id, content }) });
+        input.value = '';
+        await syncFromDb();
+        if (document.getElementById('view-profile').classList.contains('active')) renderProfileView();
+        else renderCommunity();
+      } catch (err) {
+        notify(err.message || 'Erreur commentaire');
+      }
+    }
+
+    async function sharePost(postId) {
+      if (!state.currentUser) {
+        notify('Connectez-vous pour partager');
+        return showView('auth');
+      }
+      try {
+        await apiCall(`/posts/${postId}/share`, { method: 'POST', body: JSON.stringify({ userId: state.currentUser.id, caption: '' }) });
+        notify('Publication partagée');
+        await syncFromDb();
+        showView('community');
+      } catch (err) {
+        notify(err.message || 'Erreur partage');
+      }
+    }
+
+    async function openUserProfile(userId) {
+      state.viewedProfileId = Number(userId);
+      const url = new URL(window.location.href);
+      url.searchParams.set('user', String(userId));
+      window.history.replaceState({}, '', url.toString());
+      await showView('profile');
+    }
+
+    function copyProfileLink() {
+      const id = state.viewedProfileId || state.currentUser?.id;
+      if (!id) return;
+      const link = `${window.location.origin}${window.location.pathname}?user=${id}`;
+      navigator.clipboard?.writeText(link).catch(() => {});
+      notify('Lien du profil copié');
+    }
+
+    function switchProfileTab(tab) {
+      ['all', 'photos', 'shops'].forEach(t => {
+        document.getElementById(`ptab-${t}`).classList.toggle('active', t === tab);
+        document.getElementById(`profileTab${t.charAt(0).toUpperCase() + t.slice(1)}`).style.display = t === tab ? 'block' : 'none';
+      });
+    }
+
+    async function quickUploadMedia(input, fieldName) {
+      if (!state.currentUser || Number(state.currentUser.id) !== Number(state.viewedProfileId)) {
+        return notify('Modifiez uniquement votre propre profil');
+      }
+      const file = input.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const payload = {
+            fullName: state.currentUser.fullName,
+            phone: state.currentUser.phone,
+            email: state.currentUser.email,
+            [fieldName]: reader.result
+          };
+          const res = await apiCall(`/users/${state.currentUser.id}/profile`, { method: 'PUT', body: JSON.stringify(payload) });
+          persistSessionUser(res.user);
+          notify('Photo mise à jour');
+          renderProfileView();
+        } catch (err) {
+          notify(err.message || 'Erreur upload');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function editQuickNote() {
+      if (!state.currentUser) return notify('Connectez-vous pour partager une note');
+      const note = prompt('Partagez une note...', state.currentUser.noteText || '');
+      if (note === null) return;
+      try {
+        const res = await apiCall(`/users/${state.currentUser.id}/profile`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            fullName: state.currentUser.fullName,
+            phone: state.currentUser.phone,
+            email: state.currentUser.email,
+            noteText: note.trim()
+          })
+        });
+        persistSessionUser(res.user);
+        notify('Note mise à jour');
+        if (document.getElementById('view-profile').classList.contains('active')) renderProfileView();
+        if (document.getElementById('view-messages').classList.contains('active')) renderMessagesView();
+      } catch (err) {
+        notify(err.message || 'Erreur note');
+      }
+    }
+
+    async function toggleProfileLock() {
+      if (!state.currentUser || Number(state.currentUser.id) !== Number(state.viewedProfileId)) return;
+      const nextLock = !Boolean(state.viewedProfileData?.profile?.isProfileLocked);
+      try {
+        const res = await apiCall(`/users/${state.currentUser.id}/profile`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            fullName: state.currentUser.fullName,
+            phone: state.currentUser.phone,
+            email: state.currentUser.email,
+            isProfileLocked: nextLock
+          })
+        });
+        persistSessionUser(res.user);
+        notify(nextLock ? 'Profil verrouillé' : 'Profil déverrouillé');
+        renderProfileView();
+      } catch (err) {
+        notify(err.message || 'Erreur');
+      }
+    }
+
+    async function toggleFollowUser(targetId) {
+      if (!state.currentUser) {
+        notify('Connectez-vous pour suivre');
+        return showView('auth');
+      }
+      try {
+        await apiCall(`/users/${targetId}/follow`, { method: 'POST', body: JSON.stringify({ followerId: state.currentUser.id }) });
+        renderProfileView();
+      } catch (err) {
+        notify(err.message || 'Erreur');
+      }
+    }
+
+    async function submitSellerApplication(e) {
+      e.preventDefault();
+      if (!state.currentUser) return notify('Connectez-vous d’abord');
+      try {
+        await apiCall('/seller-applications', {
+          method: 'POST',
+          body: JSON.stringify({
+            userId: state.currentUser.id,
+            fullName: document.getElementById('appFullName').value.trim(),
+            phone: document.getElementById('appPhone').value.trim(),
+            address: document.getElementById('appAddress').value.trim(),
+            shopName: document.getElementById('appShopName').value.trim(),
+            shopCity: document.getElementById('appShopCity').value,
+            cinNumber: document.getElementById('appCinNumber').value.trim(),
+            cinFrontUrl: document.getElementById('appCinFrontUrl').value.trim(),
+            cinBackUrl: document.getElementById('appCinBackUrl').value.trim(),
+            notes: document.getElementById('appNotes').value.trim()
+          })
+        });
+        notify('Dossier vendeur envoyé à l’administrateur');
+        await syncFromDb();
+        renderProfileView();
+      } catch (err) {
+        notify(err.message || 'Erreur envoi dossier');
+      }
+    }
+
+    async function renderProfileView() {
+      const targetId = state.viewedProfileId || state.currentUser?.id;
+      if (!targetId) return showView('auth');
+
+      try {
+        const viewerParam = state.currentUser ? `?viewerId=${state.currentUser.id}` : '';
+        const data = await apiCall(`/users/${targetId}${viewerParam}`);
+        state.viewedProfileData = data;
+        const p = data.profile;
+        const isMe = state.currentUser && Number(state.currentUser.id) === Number(p.id);
+        const linkStr = `${window.location.origin}${window.location.pathname}?user=${p.id}`;
+
+        document.getElementById('profTopName').textContent = p.fullName;
+        document.getElementById('fbProfileName').textContent = p.fullName;
+        document.getElementById('fbProfileFriends').textContent = `${p.role} • ${data.followersCount} abonné(e)s`;
+        document.getElementById('fbProfileLinkText').innerHTML = `<a href="${linkStr}" style="color:var(--text);text-decoration:none;">${linkStr}</a>`;
+        document.getElementById('fbProfileBio').textContent = p.bio || '';
+
+        const noteEl = document.getElementById('fbNoteBubble');
+        noteEl.textContent = p.noteText ? p.noteText : 'Partagez une note...';
+        noteEl.style.display = (isMe || p.noteText) ? 'block' : 'none';
+
+        document.getElementById('coverCamBtn').style.display = isMe ? 'flex' : 'none';
+        document.getElementById('avatarCamBtn').style.display = isMe ? 'flex' : 'none';
+        document.getElementById('profLockBtn').style.display = isMe ? 'inline-flex' : 'none';
+        document.getElementById('profLockBtn').textContent = p.isProfileLocked ? 'Déverrouiller' : 'Verrouiller';
+        document.getElementById('lockBannerTitle').textContent = p.isProfileLocked ? 'Vous avez verrouillé votre profil' : 'Profil public';
+
+        document.getElementById('fbCoverEl').style.backgroundImage = p.coverUrl ? `url("${p.coverUrl}")` : 'none';
+        renderAvatarEl(document.getElementById('fbAvatarEl'), p.fullName, p.avatarUrl);
+
+        if (isMe) {
+          const sellerBtnHtml = p.role === 'CLIENT'
+            ? `<button type="button" class="btn-orange" onclick="const b=document.getElementById('becomeSellerCard');b.style.display=b.style.display==='none'?'block':'none';">Devenir vendeur</button>`
+            : `<button type="button" class="btn-orange" onclick="showView('seller')">Tableau Vendeur</button>`;
+          document.getElementById('profActionButtons').innerHTML = `
+            ${sellerBtnHtml}
+            <button type="button" class="btn-green" onclick="showView('community');document.getElementById('storyComposerBox').style.display='block';">+ Ajouter à la story</button>
+            <button type="button" class="btn-soft" onclick="const c=document.getElementById('editProfileCard');c.style.display=c.style.display==='none'?'block':'none';">Modifier le profil</button>
+          `;
+
+          const myApps = data.applications || [];
+          document.getElementById('myApplicationStatusBox').innerHTML = myApps.length
+            ? myApps.map(a => `<div class="list-line"><strong>${a.shopName}</strong><span class="status-chip ${a.status==='APPROUVEE'?'':'wait'}">${a.status}</span></div>`).join('')
+            : '';
+          document.getElementById('appFullName').value = p.fullName || '';
+          document.getElementById('appPhone').value = p.phone || '';
+        } else {
+          document.getElementById('becomeSellerCard').style.display = 'none';
+          document.getElementById('profActionButtons').innerHTML = `
+            <button type="button" class="btn-green" onclick="startChatWith(${p.id})">Envoyer un message</button>
+            <button type="button" class="btn-soft" onclick="toggleFollowUser(${p.id})">${data.isFollowing ? 'Ne plus suivre' : 'Suivre'}</button>
+          `;
+        }
+
+        document.getElementById('editProfileCard').style.display = 'none';
+        if (isMe) {
+          document.getElementById('profName').value = p.fullName || '';
+          document.getElementById('profCityLoc').value = p.cityLocation || '';
+          document.getElementById('profBirthday').value = p.birthday || '';
+          document.getElementById('profBio').value = p.bio || '';
+          document.getElementById('profPhone').value = p.phone || '';
+          document.getElementById('profEmail').value = p.email || '';
+        }
+
+        document.getElementById('infoCityLoc').textContent = p.cityLocation || '—';
+        document.getElementById('infoBirthday').textContent = p.birthday || '—';
+        document.getElementById('infoLink').textContent = linkStr;
+
+        document.getElementById('profilePostsBox').innerHTML = renderPostsList(data.posts || []);
+
+        const allPhotos = [
+          ...(data.posts || []).filter(x => x.photoUrl).map(x => x.photoUrl),
+          ...(data.stories || []).map(s => s.photoUrl)
+        ];
+        document.getElementById('profilePhotosGrid').innerHTML = allPhotos.length
+          ? allPhotos.map(src => `<img src="${src}" alt="Photo" style="width:100%;height:125px;object-fit:cover;border-radius:8px;" />`).join('')
+          : '<p style="color:var(--muted);">Aucune photo.</p>';
+
+        document.getElementById('profileShopsBox').innerHTML = (data.shops || []).length
+          ? data.shops.map(s => `<div class="list-line"><strong>${s.name}</strong><span>${s.city} • ${s.status}</span></div>`).join('')
+          : '<p style="color:var(--muted);">Aucune boutique.</p>';
+
+        const myOrders = isMe ? state.orders.filter(o => !o.userId || Number(o.userId) === Number(p.id)) : [];
+        document.getElementById('clientOrdersBox').innerHTML = myOrders.length
+          ? myOrders.map(o => `<div class="list-line"><strong>${o.orderNum}</strong><span>${formatAr(o.total)} • ${o.orderStatus}</span></div>`).join('')
+          : '';
+      } catch (err) {
+        notify(err.message || 'Profil introuvable');
+      }
+    }
+
+    async function saveProfile(e) {
+      e.preventDefault();
+      if (!state.currentUser) return notify('Connectez-vous d’abord');
+      try {
+        const res = await apiCall(`/users/${state.currentUser.id}/profile`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            fullName: document.getElementById('profName').value.trim(),
+            cityLocation: document.getElementById('profCityLoc').value.trim(),
+            birthday: document.getElementById('profBirthday').value.trim(),
+            bio: document.getElementById('profBio').value.trim(),
+            phone: document.getElementById('profPhone').value.trim(),
+            email: document.getElementById('profEmail').value.trim()
+          })
+        });
+        persistSessionUser(res.user);
+        notify('Profil enregistré');
+        renderProfileView();
+      } catch (err) {
+        notify(err.message || 'Erreur mise à jour');
+      }
+    }
+
+    /* MESSAGERIE */
+    function toggleInboxSearch() {
+      const wrap = document.getElementById('inboxSearchWrap');
+      const next = wrap.style.display === 'none';
+      wrap.style.display = next ? 'block' : 'none';
+      if (next) document.getElementById('inboxSearchInput').focus();
+    }
+
+    function backToInbox() {
+      state.chatWithUserId = null;
+      document.getElementById('chatThreadView').style.display = 'none';
+      document.getElementById('inboxView').style.display = 'block';
+      renderInboxList();
+    }
+
+    async function startChatWith(targetUserId) {
+      if (!state.currentUser) {
+        notify('Connectez-vous pour envoyer un message');
+        return showView('auth');
+      }
+      state.chatWithUserId = Number(targetUserId);
+      await showView('messages');
+      await openChatThread(Number(targetUserId));
+    }
+
+    async function openFirstOrSelectPartner() {
+      if (!state.currentUser) {
+        notify('Connectez-vous pour envoyer un message');
+        return showView('auth');
+      }
+      const others = state.members.filter(m => Number(m.id) !== Number(state.currentUser.id));
+      if (!others.length) return notify('Aucun autre membre disponible');
+      await openChatThread(Number(others[0].id));
+    }
+
+    function renderNotesStrip() {
+      const notesRow = document.getElementById('inboxNotesRow');
+      const me = state.currentUser;
+      const others = state.members.filter(m => !me || Number(m.id) !== Number(me.id));
+
+      const myNoteHtml = me ? `
+        <div class="note-avatar-col" onclick="editQuickNote()">
+          <div class="note-cloud">${me.noteText || 'Partagez une not...'}</div>
+          <div class="note-ring">
+            ${me.avatarUrl ? `<img src="${me.avatarUrl}" alt="${me.fullName}" />` : `<div class="note-init">${me.fullName.charAt(0).toUpperCase()}</div>`}
+            <span class="online-dot"></span>
+          </div>
+          <div class="note-label">Votre note</div>
+        </div>
+      ` : '';
+
+      const othersHtml = others.map(m => {
+        const firstName = (m.fullName || '').split(' ')[0];
+        return `
+          <div class="note-avatar-col" onclick="openChatThread(${m.id})">
+            ${m.noteText ? `<div class="note-cloud">${m.noteText}</div>` : '<div style="height:22px;"></div>'}
+            <div class="note-ring">
+              ${m.avatarUrl ? `<img src="${m.avatarUrl}" alt="${m.fullName}" />` : `<div class="note-init">${(m.fullName || 'U').charAt(0).toUpperCase()}</div>`}
+              <span class="online-dot"></span>
+            </div>
+            <div class="note-label">${firstName}</div>
+          </div>
+        `;
+      }).join('');
+
+      notesRow.innerHTML = myNoteHtml + othersHtml;
+    }
+
+    function renderInboxList() {
+      const q = (document.getElementById('inboxSearchInput')?.value || '').toLowerCase().trim();
+      const me = state.currentUser;
+      const others = state.members
+        .filter(m => !me || Number(m.id) !== Number(me.id))
+        .filter(m => !q || m.fullName.toLowerCase().includes(q));
+
+      const listEl = document.getElementById('inboxConvList');
+      if (!others.length) {
+        listEl.innerHTML = '<p style="padding:16px;color:var(--muted);">Aucun membre trouvé.</p>';
+        return;
+      }
+
+      listEl.innerHTML = others.map((m, idx) => {
+        const isUnreadDemo = idx === 0 && Number(document.getElementById('msgBadge').textContent) > 0;
+        const previewText = m.noteText ? m.noteText : (idx % 2 === 1 ? 'Vous: Bonjour !' : 'Envoyer un message');
+        const pillTime = idx === 0 ? '3h' : (idx === 4 ? '10h' : '');
+        return `
+          <div class="conv-row" onclick="openChatThread(${m.id})">
+            <div class="conv-left">
+              <div class="conv-avatar-wrap">
+                ${m.avatarUrl
+                  ? `<img src="${m.avatarUrl}" alt="${m.fullName}" class="conv-avatar" />`
+                  : `<div class="conv-avatar">${(m.fullName || 'U').charAt(0).toUpperCase()}</div>`}
+                ${pillTime ? `<span class="conv-time-pill">${pillTime}</span>` : ''}
+              </div>
+              <div style="min-width:0;">
+                <div class="conv-name">${m.fullName}</div>
+                <div class="conv-preview ${isUnreadDemo ? 'unread' : ''}">${previewText}</div>
+              </div>
+            </div>
+            ${isUnreadDemo ? '<span class="unread-circle">1</span>' : '<span class="read-check">✓</span>'}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function renderMessagesView() {
+      if (!state.currentUser) {
+        document.getElementById('inboxView').style.display = 'block';
+        document.getElementById('chatThreadView').style.display = 'none';
+        renderNotesStrip();
+        renderInboxList();
+        return;
+      }
+
+      renderNotesStrip();
+      renderInboxList();
+
+      if (state.chatWithUserId) {
+        await openChatThread(state.chatWithUserId);
+      } else {
+        document.getElementById('inboxView').style.display = 'block';
+        document.getElementById('chatThreadView').style.display = 'none';
+      }
+    }
+
+    async function openChatThread(partnerId) {
+      if (!state.currentUser) {
+        notify('Connectez-vous pour discuter');
+        return showView('auth');
+      }
+      state.chatWithUserId = Number(partnerId);
+      const partner = state.members.find(m => Number(m.id) === Number(partnerId));
+      document.getElementById('inboxView').style.display = 'none';
+      document.getElementById('chatThreadView').style.display = 'flex';
+      document.getElementById('chatPartnerName').textContent = partner ? partner.fullName : 'Discussion';
+      document.getElementById('chatPartnerStatus').textContent = partner?.cityLocation || 'En ligne';
+      document.getElementById('chatPartnerAvatarWrap').innerHTML = renderMiniAvatarHtml(partner?.fullName || 'U', partner?.avatarUrl, 36);
+      document.getElementById('chatPartnerProfileBtn').onclick = () => openUserProfile(Number(partnerId));
+
+      const data = await apiCall(`/messages?userId=${state.currentUser.id}&withUserId=${partnerId}`);
+      state.chatMessages = data.messages || [];
+
+      const stream = document.getElementById('chatMessagesStream');
+      if (!state.chatMessages.length) {
+        stream.innerHTML = '<div class="msg-stamp">Début de la conversation</div>';
+        return;
+      }
+
+      stream.innerHTML = state.chatMessages.map((msg, idx) => {
+        const isMe = Number(msg.senderId) === Number(state.currentUser.id);
+        const dt = msg.createdAt ? new Date(msg.createdAt) : null;
+        const timeStr = dt && !isNaN(dt) ? dt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+        const showStamp = idx === 0 || idx === Math.floor(state.chatMessages.length / 2);
+
+        return `
+          ${showStamp && timeStr ? `<div class="msg-stamp">${timeStr}</div>` : ''}
+          <div class="bubble-row ${isMe ? 'me' : 'them'}">
+            ${!isMe ? renderMiniAvatarHtml(partner?.fullName || 'U', partner?.avatarUrl, 26) : ''}
+            <div class="msg-bubble">
+              ${msg.content ? `<div>${msg.content}</div>` : ''}
+              ${msg.imageUrl ? `<img src="${msg.imageUrl}" alt="Pièce jointe" style="max-width:210px;border-radius:10px;margin-top:4px;display:block;" />` : ''}
+            </div>
+          </div>
+          ${!isMe && idx === state.chatMessages.length - 1 ? '<div class="msg-react-tag">🙂</div>' : ''}
+        `;
+      }).join('');
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    async function sendDirectMessage(e) {
+      e.preventDefault();
+      if (!state.currentUser || !state.chatWithUserId) return notify('Sélectionnez un destinataire');
+      const content = document.getElementById('msgInput').value.trim();
+      const imageUrl = document.getElementById('msgPhotoUrl').value.trim();
+      if (!content && !imageUrl) return;
+      try {
+        await apiCall('/messages', {
+          method: 'POST',
+          body: JSON.stringify({
+            senderId: state.currentUser.id,
+            receiverId: state.chatWithUserId,
+            content,
+            imageUrl
+          })
+        });
+        document.getElementById('msgInput').value = '';
+        document.getElementById('msgPhotoUrl').value = '';
+        document.getElementById('msgFile').value = '';
+        await openChatThread(state.chatWithUserId);
+      } catch (err) {
+        notify(err.message || 'Erreur envoi');
+      }
+    }
+
+    async function sendQuickThumb() {
+      if (!state.currentUser || !state.chatWithUserId) return;
+      try {
+        await apiCall('/messages', {
+          method: 'POST',
+          body: JSON.stringify({
+            senderId: state.currentUser.id,
+            receiverId: state.chatWithUserId,
+            content: '👍',
+            imageUrl: ''
+          })
+        });
+        await openChatThread(state.chatWithUserId);
+      } catch (err) {
+        notify(err.message || 'Erreur envoi');
+      }
+    }
+
+    /* CATALOGUE, PANIER, AUTH */
+    function renderCatalog() {
+      const q = (document.getElementById('qInput').value || '').toLowerCase().trim();
+      const cat = document.getElementById('fCategory').value;
+      const city = document.getElementById('fCity').value;
+      const minP = parseFloat(document.getElementById('fMinPrice').value) || 0;
+      const maxP = parseFloat(document.getElementById('fMaxPrice').value) || Infinity;
+      const minR = parseFloat(document.getElementById('fRating').value) || 0;
+      const onlyStock = document.getElementById('fStock').checked;
+      const onlyPromo = document.getElementById('fPromo').checked;
+      const sort = document.getElementById('fSort').value;
+
+      let list = state.products.filter(p => {
+        const eff = p.promo || p.price;
+        if (q && !p.name.toLowerCase().includes(q) && !p.shop.toLowerCase().includes(q) && !p.city.toLowerCase().includes(q)) return false;
+        if (cat && p.category !== cat) return false;
+        if (city && p.city !== city) return false;
+        if (eff < minP || eff > maxP) return false;
+        if (p.rating < minR) return false;
+        if (onlyStock && p.stock <= 0) return false;
+        if (onlyPromo && !p.promo) return false;
+        return true;
+      });
+
+      if (sort === 'price_asc') list.sort((a, b) => (a.promo || a.price) - (b.promo || b.price));
+      else if (sort === 'price_desc') list.sort((a, b) => (b.promo || b.price) - (a.promo || a.price));
+      else if (sort === 'sales') list.sort((a, b) => b.sales - a.sales);
+      else list.sort((a, b) => b.rating - a.rating);
+
+      const grid = document.getElementById('catalogGrid');
+      if (!list.length) {
+        grid.innerHTML = '<div class="card-box"><p>Aucun produit trouvé.</p></div>';
+        return;
+      }
+
+      grid.innerHTML = list.map(p => {
+        const pct = p.promo ? Math.round(((p.price - p.promo) / p.price) * 100) : 0;
+        const priceHtml = p.promo
+          ? `<span class="prod-price">${formatAr(p.promo)}</span><span class="prod-old">${formatAr(p.price)}</span>`
+          : `<span class="prod-price">${formatAr(p.price)}</span>`;
+        return `
+          <div class="prod-card">
+            <div>
+              <div class="prod-thumb">
+                ${pct > 0 ? `<span class="disc-tag">-${pct}%</span>` : ''}
+                <span class="stock-pill">${p.stock > 0 ? 'Stock: ' + p.stock : 'Rupture'}</span>
+                ${prodSvg(p.emoji)}
+              </div>
+              <div class="prod-body">
+                <div>
+                  <div class="prod-meta">${p.city} • ${p.rating}/5</div>
+                  <div class="prod-title">${p.name}</div>
+                  <div>${priceHtml}</div>
+                  <div class="prod-shop">Boutique : <strong>${p.shop}</strong></div>
+                </div>
+                <button class="btn-orange" style="margin-top:10px;width:100%;" onclick="addToCart(${p.id})">Ajouter au panier</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateCartBadge() {
+      document.getElementById('cartCount').textContent = state.cart.reduce((s, i) => s + i.qty, 0);
+    }
+
+    function addToCart(id) {
+      const p = state.products.find(x => x.id === id);
+      if (!p || p.stock <= 0) return notify('Produit indisponible');
+      const existing = state.cart.find(x => x.id === id);
+      if (existing) existing.qty += 1;
+      else state.cart.push({ id: p.id, name: p.name, price: p.promo || p.price, shop: p.shop, city: p.city, qty: 1 });
+      updateCartBadge();
+      notify('Ajouté au panier : ' + p.name);
+    }
+
+    function changeCartQty(idx, delta) {
+      state.cart[idx].qty += delta;
+      if (state.cart[idx].qty <= 0) state.cart.splice(idx, 1);
+      updateCartBadge();
+      renderCart();
+    }
+
+    function updatePayBox() {
+      const code = document.getElementById('payMethod').value;
+      const ch = state.paymentChannels.find(c => c.code === code);
+      const info = document.getElementById('payInfoBox');
+      const proof = document.getElementById('proofBox');
+      if (!ch) {
+        info.innerHTML = '';
+        return;
+      }
+      info.innerHTML = `${ch.label} : <strong>${ch.accountNumber}</strong> (${ch.accountHolder})`;
+      proof.style.display = ch.requiresProof ? 'block' : 'none';
+    }
+
+    function renderCart() {
+      const box = document.getElementById('cartItemsBox');
+      const totals = document.getElementById('cartTotals');
+      if (!state.cart.length) {
+        box.innerHTML = '<p style="color:var(--muted);">Votre panier est vide.</p>';
+        totals.innerHTML = '';
+        return;
+      }
+
+      box.innerHTML = state.cart.map((it, i) => `
+        <div class="list-line">
+          <div style="min-width:0;">
+            <strong style="overflow-wrap:anywhere;">${it.name}</strong><br>
+            <small style="color:var(--muted);">${it.shop} — ${formatAr(it.price)}</small>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button class="btn-outline" onclick="changeCartQty(${i}, -1)">-</button>
+            <strong>${it.qty}</strong>
+            <button class="btn-outline" onclick="changeCartQty(${i}, 1)">+</button>
+          </div>
+        </div>
+      `).join('');
+
+      const city = document.getElementById('shipCity').value;
+      const type = document.getElementById('shipType').value;
+      const shopsCount = new Set(state.cart.map(i => i.shop)).size;
+      const fee = getDeliveryFee(city, type) * shopsCount;
+      const sub = state.cart.reduce((s, i) => s + i.price * i.qty, 0);
+
+      totals.innerHTML = `
+        <div>Sous-total : <strong>${formatAr(sub)}</strong></div>
+        <div>Livraison (${shopsCount} boutique${shopsCount > 1 ? 's' : ''}) : <strong>${formatAr(fee)}</strong></div>
+        <div style="font-size:1.08rem;color:var(--green-dark);margin-top:4px;">Total : <strong>${formatAr(sub + fee)}</strong></div>
+      `;
+    }
+
+    async function placeOrder() {
+      if (!state.cart.length) return notify('Votre panier est vide');
+      const customerName = document.getElementById('shipName').value.trim();
+      const customerPhone = document.getElementById('shipPhone').value.trim();
+      const address = document.getElementById('shipAddress').value.trim();
+      if (!customerName || !customerPhone) return notify('Renseignez le nom et le téléphone');
+
+      try {
+        const order = await apiCall('/orders', {
+          method: 'POST',
+          body: JSON.stringify({
+            userId: state.currentUser?.id || null,
+            customerName,
+            customerPhone,
+            city: document.getElementById('shipCity').value,
+            deliveryType: document.getElementById('shipType').value,
+            address,
+            payMethod: document.getElementById('payMethod').value,
+            txRef: document.getElementById('txRef').value.trim(),
+            items: state.cart
+          })
+        });
+        state.cart = [];
+        updateCartBadge();
+        notify('Commande ' + order.orderNum + ' enregistrée');
+        if (state.currentUser) openUserProfile(state.currentUser.id);
+        else showView('catalog');
+      } catch (e) {
+        notify(e.message || 'Erreur commande');
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      try {
+        const res = await apiCall('/login', {
+          method: 'POST',
+          body: JSON.stringify({
+            identifier: document.getElementById('authEmail').value.trim(),
+            password: document.getElementById('authPass').value
+          })
+        });
+        persistSessionUser(res.user);
+        notify('Connecté : ' + res.user.fullName);
+        if (res.user.role === 'ADMINISTRATEUR') showView('admin');
+        else if (res.user.role === 'VENDEUR') showView('seller');
+        else openUserProfile(res.user.id);
+      } catch (err) {
+        notify(err.message || 'Identifiants invalides');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      try {
+        const res = await apiCall('/register', {
+          method: 'POST',
+          body: JSON.stringify({
+            fullName: document.getElementById('regName').value.trim(),
+            phone: document.getElementById('regPhone').value.trim(),
+            email: document.getElementById('regEmail').value.trim(),
+            password: document.getElementById('regPass').value
+          })
+        });
+        persistSessionUser(res.user);
+        notify('Compte client créé');
+        openUserProfile(res.user.id);
+      } catch (err) {
+        notify(err.message || 'Erreur inscription');
+      }
+    }
+
+    /* TABLEAU VENDEUR */
+    function getActiveShop() {
+      if (!state.currentUser) return null;
+      return state.shops.find(s => Number(s.ownerUserId) === Number(state.currentUser.id)) || state.shops[0] || null;
+    }
+
+    function renderSeller() {
+      const guard = document.getElementById('sellerGuardBox');
+      const panel = document.getElementById('sellerActivePanel');
+
+      if (!isSellerOrAdmin()) {
+        guard.style.display = 'block';
+        panel.style.display = 'none';
+        return;
+      }
+
+      guard.style.display = 'none';
+      const shop = getActiveShop();
+      if (!shop) {
+        panel.style.display = 'none';
+        return;
+      }
+
+      panel.style.display = 'block';
+      document.getElementById('sellerShopTitle').textContent = shop.name;
+      document.getElementById('sellerShopMeta').textContent = `Ville : ${shop.city} • Statut : ${shop.status} • Commission : ${state.commissionRate}%`;
+
+      const shopProds = state.products.filter(p => p.shop === shop.name);
+      document.getElementById('sellerStats').innerHTML = `
+        <div class="kpi-item or"><small>Solde en attente</small><div>${formatAr(shop.pending)}</div></div>
+        <div class="kpi-item"><small>Solde disponible</small><div>${formatAr(shop.available)}</div></div>
+        <div class="kpi-item"><small>Produits</small><div>${shopProds.length}</div></div>
+      `;
+
+      document.getElementById('sellerProductsBox').innerHTML = shopProds.length ? shopProds.map(p => `
+        <div class="list-line">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+            <span style="width:18px;height:18px;display:inline-flex;">${prodSvg(p.emoji)}</span>
+            <strong style="overflow-wrap:anywhere;">${p.name}</strong> — ${formatAr(p.promo || p.price)}
+          </div>
+          <small>Stock: ${p.stock}</small>
+        </div>
+      `).join('') : '<p style="color:var(--muted);">Aucun produit.</p>';
+
+      const subs = state.sellerOrders.filter(s => s.shop === shop.name);
+      document.getElementById('sellerSubOrdersBox').innerHTML = subs.length ? subs.map(s => `
+        <div class="list-line">
+          <div>
+            <strong>${s.subNum}</strong><br>
+            <small>Net vendeur : <strong>${formatAr(s.net)}</strong> (Commission : ${formatAr(s.comm)})</small>
+          </div>
+          <select style="width:auto;margin:0;" onchange="changeSubOrderStatus(${s.id}, this.value)">
+            <option ${s.status==='EN_ATTENTE_PAIEMENT'?'selected':''}>EN_ATTENTE_PAIEMENT</option>
+            <option ${s.status==='COMMANDE_CONFIRMEE'?'selected':''}>COMMANDE_CONFIRMEE</option>
+            <option ${s.status==='EN_PREPARATION'?'selected':''}>EN_PREPARATION</option>
+            <option ${s.status==='EXPEDIEE'?'selected':''}>EXPEDIEE</option>
+            <option ${s.status==='LIVREE'?'selected':''}>LIVREE</option>
+          </select>
+        </div>
+      `).join('') : '<p style="color:var(--muted);">Aucune sous-commande.</p>';
+    }
+
+    async function addSellerProduct(e) {
+      e.preventDefault();
+      if (!isSellerOrAdmin()) return notify('Accès refusé');
+      const shop = getActiveShop();
+      if (!shop) return notify('Boutique introuvable');
+      try {
+        await apiCall('/products', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: document.getElementById('spName').value.trim(),
+            category: document.getElementById('spCat').value,
+            price: Number(document.getElementById('spPrice').value),
+            promo: document.getElementById('spPromo').value ? Number(document.getElementById('spPromo').value) : null,
+            stock: Number(document.getElementById('spStock').value),
+            city: document.getElementById('spCity').value,
+            shop: shop.name,
+            emoji: document.getElementById('spEmoji').value.trim() || 'box'
+          })
+        });
+        e.target.reset();
+        notify('Produit publié');
+        await syncFromDb();
+        renderSeller();
+      } catch (err) {
+        notify(err.message || 'Erreur ajout produit');
+      }
+    }
+
+    async function changeSubOrderStatus(subId, newStatus) {
+      if (!isSellerOrAdmin()) return notify('Accès refusé');
+      try {
+        await apiCall(`/sub-orders/${subId}/status`, { method: 'PATCH', body: JSON.stringify({ status: newStatus }) });
+        notify('Statut : ' + newStatus);
+        await syncFromDb();
+        renderSeller();
+      } catch (err) {
+        notify(err.message || 'Erreur statut');
+      }
+    }
+
+    async function requestWithdrawal() {
+      if (!isSellerOrAdmin()) return notify('Accès refusé');
+      const shop = getActiveShop();
+      if (!shop || shop.available <= 0) return notify('Solde disponible insuffisant');
+      try {
+        const r = await apiCall(`/shops/${shop.id}/withdraw`, { method: 'POST' });
+        notify('Retrait demandé : ' + formatAr(r.amount));
+        await syncFromDb();
+        renderSeller();
+      } catch (err) {
+        notify(err.message || 'Erreur retrait');
+      }
+    }
+
+    /* TABLEAU ADMINISTRATEUR */
+    function renderSelectedApplication() {
+      const appId = Number(document.getElementById('sellerAppSelect').value);
+      const detail = document.getElementById('selectedApplicationDetail');
+      if (!appId) {
+        detail.innerHTML = '';
+        return;
+      }
+      const a = state.sellerApplications.find(x => Number(x.id) === appId);
+      if (!a) {
+        detail.innerHTML = '';
+        return;
+      }
+
+      detail.innerHTML = `
+        <div class="dossier-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+            <strong>${a.fullName}</strong>
+            <span class="status-chip ${a.status==='APPROUVEE'?'':'wait'}">${a.status}</span>
+          </div>
+          <div style="font-size:0.84rem;line-height:1.55;">
+            <div><strong>Téléphone :</strong> ${a.phone}</div>
+            <div><strong>Email :</strong> ${a.userEmail || ''}</div>
+            <div><strong>Adresse :</strong> ${a.address}</div>
+            <div><strong>Boutique :</strong> ${a.shopName} (${a.shopCity})</div>
+            <div><strong>N° CIN :</strong> ${a.cinNumber || '—'}</div>
+            ${a.notes ? `<div><strong>Notes :</strong> ${a.notes}</div>` : ''}
+          </div>
+          <div class="cin-grid">
+            <div class="cin-box">
+              <strong style="font-size:0.78rem;">CIN Recto</strong>
+              <img src="${a.cinFrontUrl}" alt="CIN Recto" />
+            </div>
+            <div class="cin-box">
+              <strong style="font-size:0.78rem;">CIN Verso</strong>
+              <img src="${a.cinBackUrl}" alt="CIN Verso" />
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+            <button class="btn-green" onclick="reviewSellerApplication(${a.id}, 'APPROUVEE')">Valider &amp; passer Vendeur</button>
+            <button class="btn-orange" onclick="reviewSellerApplication(${a.id}, 'REJETEE')">Rejeter</button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function reviewSellerApplication(appId, decision) {
+      if (!isAdmin()) return notify('Accès refusé');
+      try {
+        await apiCall(`/seller-applications/${appId}/review`, {
+          method: 'POST',
+          body: JSON.stringify({ decision })
+        });
+        notify('Dossier : ' + decision);
+        await syncFromDb();
+        renderAdmin();
+        document.getElementById('sellerAppSelect').value = String(appId);
+        renderSelectedApplication();
+      } catch (err) {
+        notify(err.message || 'Erreur validation');
+      }
+    }
+
+    function renderAdmin() {
+      const guard = document.getElementById('adminGuardBox');
+      const panel = document.getElementById('adminPanelContent');
+
+      if (!isAdmin()) {
+        guard.style.display = 'block';
+        panel.style.display = 'none';
+        return;
+      }
+
+      guard.style.display = 'none';
+      panel.style.display = 'block';
+
+      const sel = document.getElementById('sellerAppSelect');
+      const prevApp = sel.value;
+      sel.innerHTML = '<option value="">-- Choisir un nom de vendeur --</option>' +
+        state.sellerApplications.map(a => `<option value="${a.id}">${a.fullName}</option>`).join('');
+      if (prevApp && state.sellerApplications.some(a => String(a.id) === String(prevApp))) {
+        sel.value = prevApp;
+        renderSelectedApplication();
+      } else {
+        document.getElementById('selectedApplicationDetail').innerHTML = '';
+      }
+
+      const paidOrders = state.orders.filter(o => o.payStatus === 'CONFIRME');
+      const ca = paidOrders.reduce((s, o) => s + o.total, 0);
+      const comms = state.sellerOrders.filter(s => {
+        const po = state.orders.find(o => o.id === s.orderId);
+        return po && po.payStatus === 'CONFIRME';
+      }).reduce((s, x) => s + x.comm, 0);
+
+      document.getElementById('adminStats').innerHTML = `
+        <div class="kpi-item"><small>Chiffre d'affaires</small><div>${formatAr(ca)}</div></div>
+        <div class="kpi-item or"><small>Commissions (${state.commissionRate}%)</small><div>${formatAr(comms)}</div></div>
+        <div class="kpi-item"><small>Dossiers vendeurs</small><div>${state.sellerApplications.length}</div></div>
+        <div class="kpi-item"><small>Boutiques</small><div>${state.shops.length}</div></div>
+      `;
+
+      document.getElementById('adminCommInput').value = state.commissionRate;
+
+      document.getElementById('adminChannelsBox').innerHTML = state.paymentChannels.map(ch => `
+        <div class="list-line">
+          <div style="flex:1;min-width:200px;">
+            <strong>${ch.label}</strong> (${ch.code})
+            <input type="text" id="chAcc-${ch.code}" value="${ch.accountNumber}" style="margin:4px 0;" />
+            <input type="text" id="chHold-${ch.code}" value="${ch.accountHolder}" style="margin:0;" />
+          </div>
+          <button class="btn-green" onclick="saveChannel('${ch.code}')">Enregistrer</button>
+        </div>
+      `).join('');
+
+      document.getElementById('adminShopsBox').innerHTML = state.shops.length ? state.shops.map(s => `
+        <div class="list-line">
+          <div style="min-width:0;"><strong style="overflow-wrap:anywhere;">${s.name}</strong> (${s.city} • ${s.owner}) — <span class="status-chip ${s.status==='APPROUVEE'?'':'wait'}">${s.status}</span></div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn-green" style="padding:5px 10px;" onclick="setShopStatus(${s.id}, 'APPROUVEE')">Approuver</button>
+            <button class="btn-orange" style="padding:5px 10px;" onclick="setShopStatus(${s.id}, 'SUSPENDUE')">Suspendre</button>
+          </div>
+        </div>
+      `).join('') : '<p style="color:var(--muted);">Aucune boutique.</p>';
+
+      document.getElementById('adminPaymentsBox').innerHTML = state.payments.length ? state.payments.map(p => `
+        <div class="list-line">
+          <div>
+            <strong>${p.orderNum}</strong> • ${formatAr(p.amount)} (${p.method})<br>
+            <small>Réf : ${p.txRef || '—'} • <span class="status-chip ${p.status==='CONFIRME'?'':'wait'}">${p.status}</span></small>
+          </div>
+          ${p.status !== 'CONFIRME' ? `<button class="btn-green" style="padding:5px 10px;" onclick="confirmPayment(${p.id})">Confirmer</button>` : '<span class="status-chip">Validé</span>'}
+        </div>
+      `).join('') : '<p style="color:var(--muted);">Aucun paiement.</p>';
+    }
+
+    async function updateCommission() {
+      if (!isAdmin()) return notify('Accès refusé');
+      const val = parseFloat(document.getElementById('adminCommInput').value);
+      if (isNaN(val) || val < 0 || val > 50) return notify('Taux invalide');
+      try {
+        await apiCall('/settings/commission', { method: 'PUT', body: JSON.stringify({ commissionRate: val }) });
+        notify('Commission : ' + val + '%');
+        await syncFromDb();
+        renderAdmin();
+      } catch (err) {
+        notify(err.message || 'Erreur commission');
+      }
+    }
+
+    async function saveDeliveryRate() {
+      if (!isAdmin()) return notify('Accès refusé');
+      const fee = Number(document.getElementById('rateFee').value);
+      if (isNaN(fee) || fee < 0) return notify('Montant invalide');
+      try {
+        await apiCall('/delivery-rates', {
+          method: 'PUT',
+          body: JSON.stringify({
+            city: document.getElementById('rateCity').value,
+            deliveryType: document.getElementById('rateType').value,
+            fee
+          })
+        });
+        notify('Tarif mis à jour');
+        await syncFromDb();
+      } catch (err) {
+        notify(err.message || 'Erreur tarif');
+      }
+    }
+
+    async function saveChannel(code) {
+      if (!isAdmin()) return notify('Accès refusé');
+      try {
+        await apiCall(`/payment-channels/${code}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+            accountNumber: document.getElementById(`chAcc-${code}`).value.trim(),
+            accountHolder: document.getElementById(`chHold-${code}`).value.trim()
+          })
+        });
+        notify('Compte mis à jour');
+        await syncFromDb();
+        renderAdmin();
+      } catch (err) {
+        notify(err.message || 'Erreur compte');
+      }
+    }
+
+    async function setShopStatus(shopId, status) {
+      if (!isAdmin()) return notify('Accès refusé');
+      try {
+        await apiCall(`/shops/${shopId}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+        notify('Boutique : ' + status);
+        await syncFromDb();
+        renderAdmin();
+      } catch (err) {
+        notify(err.message || 'Erreur statut');
+      }
+    }
+
+    async function confirmPayment(payId) {
+      if (!isAdmin()) return notify('Accès refusé');
+      try {
+        await apiCall(`/payments/${payId}/confirm`, { method: 'POST' });
+        notify('Paiement confirmé');
+        await syncFromDb();
+        renderAdmin();
+      } catch (err) {
+        notify(err.message || 'Erreur confirmation');
+      }
+    }
+
+    (async () => {
+      restoreSessionUser();
+      syncUserUi();
+      await syncFromDb();
+      const paramUser = new URLSearchParams(window.location.search).get('user');
+      if (paramUser) {
+        openUserProfile(paramUser);
+      }
+    })();
+  </script>
+</body>
+</html>
