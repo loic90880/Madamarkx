@@ -2,3 +2,4 @@ node_modules/
 *.log
 .env
 pgdata/
+madamarket_backup_*
